@@ -31,7 +31,9 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   const app = express();
   
+  console.log("⏳ Connecting to MongoDB...");
   await connectDB();
+  console.log("✅ MongoDB Connected Successfully!");
   
   app.set("trust proxy", 1);
   
@@ -87,6 +89,7 @@ async function startServer() {
   });
 
   if (process.env.NODE_ENV !== "production") {
+    console.log("Starting Vite Middleware (Development Mode)");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -94,22 +97,28 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+    }
   }
 
   if (process.env.NODE_ENV === "production") {
     const distPath = path.join(process.cwd(), "dist");
-    app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
+    if (fs.existsSync(distPath)) {
+      app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
+    }
   }
 
   app.use(errorMiddleware);
 
   app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 XR Backend officially running on port ${PORT}`);
     logger.info(`XR running on port ${PORT}`);
   });
 }
 
 startServer().catch((err) => {
+  console.error("❌ CRITICAL SERVER ERROR:", err);
   logger.error("Failed to start server:", err);
   process.exit(1);
 });
