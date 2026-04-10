@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, ChevronDown } from 'lucide-react';
 import { cn } from '../lib/utils';
 import SEO from '../components/SEO';
+// 1. Axios import karna zaroori hai
+import axios from 'axios';
 
 export default function Contact() {
   const [formState, setFormState] = useState({ 
@@ -30,22 +32,23 @@ export default function Contact() {
     setStatus('loading');
     
     try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formState, source: 'contact' }), 
+      // 2. Fetch ki jagah Axios ka istemal
+      // Ye automatically App.jsx mein set kiye gaye VITE_API_URL ko use karega
+      const res = await axios.post('/api/leads', { 
+        ...formState, 
+        source: 'contact' 
       });
       
-      if (res.ok) {
+      // 3. Status check (Axios mein res.status hota hai)
+      if (res.status === 200 || res.status === 201) {
         setStatus('success');
         setFormState({ name: '', email: '', whatsapp: '', service: 'General Inquiry', message: '' });
       } else {
-        const result = await res.json();
-        console.error("Backend error:", result);
         setStatus('error');
       }
     } catch (err) {
-      console.error('Contact form error:', err);
+      // Backend error console mein dekhne ke liye
+      console.error('Contact form error:', err.response?.data || err.message);
       setStatus('error');
     }
   };
@@ -85,7 +88,7 @@ export default function Contact() {
 
             <div className="mt-16 rounded-4xl overflow-hidden h-64 bg-slate-100 border border-slate-200">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14656.637372274941!2d85.323565!3d23.364408!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f4e17cb97c0bbf%3A0xc6651813bc306c!2sLalpur%2C%20Ranchi%2C%20Jharkhand!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58632.18182255757!2d85.29742614863281!3d23.369651500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f4e1075306660b%3A0xb33887c2936270b2!2sLalpur%2C%20Ranchi%2C%20Jharkhand!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -127,7 +130,7 @@ export default function Contact() {
                       value={formState.name}
                       onChange={e => setFormState({ ...formState, name: e.target.value })}
                       className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
-                      placeholder="Enter your  name"
+                      placeholder="Enter your name"
                     />
                   </div>
                   <div>
@@ -144,7 +147,7 @@ export default function Contact() {
                         "w-full bg-white border rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-all",
                         errors.email ? "border-red-500 focus:border-red-500" : "border-slate-200 focus:border-brand-500"
                       )}
-                      placeholder="Enter your email "
+                      placeholder="Enter your email"
                     />
                     {errors.email && (
                       <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
