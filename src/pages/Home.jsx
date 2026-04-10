@@ -46,7 +46,7 @@ export default function Home() {
     { 
       name: 'Suryanshu Kumar Nayak', 
       role: 'COO, XR System', 
-      image: siteSettings?.team?.suryanshuNayak || 'https://picsum.photos/seed/suryanshu/600/800',
+      image: siteSettings?.team?.suryanshuNayak || 'https://res.cloudinary.com/dayu6wld9/image/upload/v1775837488/xr_system_portfolio/a8w26klcmxs5faexg2eg.png',
       text: 'We believe in building long-term relationships with our clients by providing exceptional support and innovative technology.' 
     },
     { 
@@ -284,7 +284,7 @@ export default function Home() {
             
             <div className="relative">
               <div className="rounded-3xl overflow-hidden shadow-2xl">
-                <img src={siteSettings?.homeBanner || "https://picsum.photos/seed/ranchi-office/800/600"} alt="Our Team" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img src={siteSettings?.homeBanner || "https://res.cloudinary.com/dayu6wld9/image/upload/v1775764130/xr_system_portfolio/cm914wghdvynsuwfmswr.png"} alt="Our Team" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             </div>
           </div>
