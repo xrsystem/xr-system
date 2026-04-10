@@ -44,9 +44,9 @@ export default function Home() {
       text: 'We are committed to delivering high-quality digital solutions that drive real business growth for our clients in Ranchi and beyond.' 
     },
     { 
-      name: 'Monu Kumar Nayak', 
+      name: 'Suryanshu Kumar Nayak', 
       role: 'COO, XR System', 
-      image: siteSettings?.team?.monuNayak || 'https://picsum.photos/seed/monu/600/800',
+      image: siteSettings?.team?.suryanshuNayak || 'https://picsum.photos/seed/suryanshu/600/800',
       text: 'We believe in building long-term relationships with our clients by providing exceptional support and innovative technology.' 
     },
     { 
