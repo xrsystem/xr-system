@@ -70,24 +70,14 @@ export default function QuoteModal({ isOpen, onClose, selectedPlan }) {
     }
 
     try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          service: serviceName,
-          price: finalPrice, 
-          promoDetails: promoText
-        })
+      const res = await axios.post('/api/leads', {
+        ...formData,
+        service: serviceName,
+        price: finalPrice, 
+        promoDetails: promoText
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(JSON.parse(errorText).message || 'Something went wrong');
-      }
-
-      const result = await res.json();
-      if (result.success) {
+      if (res.status === 200 || res.status === 201) {
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
@@ -96,9 +86,11 @@ export default function QuoteModal({ isOpen, onClose, selectedPlan }) {
           setPromoStatus({ type: '', message: '', value: null });
           onClose();
         }, 5000);
+      } else {
+         throw new Error('Something went wrong');
       }
     } catch (err) {
-      setError(err.message || 'Failed to submit request. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
     }
