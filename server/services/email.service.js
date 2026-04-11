@@ -1,35 +1,32 @@
-import nodemailer from 'nodemailer';
+import axios from 'axios';
 import logger from '../config/logger.js';
 
 export const sendEmail = async (to, subject, htmlContent) => {
   try {
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      logger.warn("⚠️ Email credentials missing in .env file. Email sending skipped.");
+    if (!process.env.BREVO_API_KEY) {
+      logger.warn("⚠️ Brevo API Key missing in .env file. Email sending skipped.");
       return false;
     }
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: `"XR System" <${process.env.SMTP_USER}>`,
-      to: to,
+    const emailData = {
+      sender: { name: "XR System", email: process.env.SMTP_USER }, 
+      to: [{ email: to }],
       subject: subject,
-      html: htmlContent,
+      htmlContent: htmlContent,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    logger.info(`📧 Email successfully sent to ${to} (ID: ${info.messageId})`);
+    await axios.post('https://api.brevo.com/v3/smtp/email', emailData, {
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      }
+    });
+
+    logger.info(`📧 API Email successfully sent to ${to} 🚀`);
     return true;
   } catch (error) {
-    logger.error(`🔴 Failed to send email to ${to}. Error: ${error.message}`);
+    logger.error(`🔴 API Email Failed: ${error.response?.data?.message || error.message}`);
     return false;
   }
 };
@@ -48,6 +45,15 @@ export const sendPortalLink = async (to, name, notionUrl) => {
           Open My Dashboard
         </a>
       </div>
+      
+      <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #4F46E5;">
+        <p style="margin: 0; color: #475569; font-size: 14px;">
+          <strong>Security Note:</strong> This is a unique private link. Please do not share it with anyone outside your team.
+        </p>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+      <p style="color: #94a3b8; font-size: 12px; text-align: center;">XR System • Digital Solutions & Transparency</p>
     </div>
   `;
   return await sendEmail(to, subject, htmlContent);
