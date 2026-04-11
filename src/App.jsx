@@ -19,6 +19,8 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import ClientPortal from './pages/ClientPortal'; 
 import SecretAdminLogin from './pages/SecretAdminLogin'; 
 
+import Invoice from './pages/Invoice'; 
+
 import AdminLayout from './components/AdminLayout'; 
 import DashboardHome from './pages/DashboardHome';
 import CrmLeads from './pages/CrmLeads'; 
@@ -43,7 +45,9 @@ const ProtectedRoute = ({ children }) => {
 function AppContent() {
   const location = useLocation();
   
-  const isAuth = ['/login', '/xradmin'].includes(location.pathname) || location.pathname.startsWith('/admin');
+  const isAuth = ['/login', '/xradmin'].includes(location.pathname) || 
+                 location.pathname.startsWith('/admin') || 
+                 location.pathname.startsWith('/invoice');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -61,6 +65,8 @@ function AppContent() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          
+          <Route path="/invoice/:id" element={<Invoice />} />
           
           <Route path="/login" element={<ClientPortal />} />
 
