@@ -4,7 +4,6 @@ import { StatusCodes } from 'http-status-codes';
 import asyncHandler from 'express-async-handler';
 import * as onboardingService from '../services/onboarding.service.js';
 import { addLeadToNotion, updateNotionPortalAccess, updateNotionLeadStatus } from '../services/notion.service.js';
-
 import crypto from 'crypto';
 import { createInvoicePaymentLink, sendInvoiceEmail } from '../services/billing.service.js';
 
@@ -26,7 +25,8 @@ const getPlanAmount = (service, source) => {
 export const createLead = asyncHandler(async (req, res) => {
   const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails } = req.body;
   const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
-  const lead = await Lead.create({ name, email, whatsapp, businessName, websiteUrl, service, message, price: amount });
+  
+  const lead = await Lead.create({ name, email, whatsapp, businessName, websiteUrl, service, message, price: amount, advancePaid: 0 });
 
   await onboardingService.sendClientConfirmation(lead);
   await onboardingService.sendAdminNotification(lead);
@@ -38,14 +38,16 @@ export const createLead = asyncHandler(async (req, res) => {
   }
 
   let paymentLink = null;
-  if (amount > 0) {
-    paymentLink = await onboardingService.generatePaymentLink(lead, amount);
-    if (paymentLink) {
-      lead.razorpayPaymentId = paymentLink;
-      await lead.save();
-    }
-  }
   res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead created successfully"));
+});
+
+export const getLeadById = asyncHandler(async (req, res) => {
+  const lead = await Lead.findById(req.params.id);
+  if (!lead) {
+    res.status(StatusCodes.NOT_FOUND);
+    throw new Error("Invoice not found");
+  }
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, "Invoice fetched successfully"));
 });
 
 export const getLeads = asyncHandler(async (req, res) => {
@@ -69,17 +71,13 @@ export const togglePortalAccess = asyncHandler(async (req, res) => {
 export const updateLeadStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-
   const lead = await Lead.findById(id);
   if (!lead) { res.status(StatusCodes.NOT_FOUND); throw new Error("Lead not found"); }
 
   lead.status = status;
   await lead.save();
 
-  if (lead.notionPageId) {
-    await updateNotionLeadStatus(lead.notionPageId, status);
-  }
-
+  if (lead.notionPageId) { await updateNotionLeadStatus(lead.notionPageId, status); }
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, `Status updated to ${status}`));
 });
 
@@ -91,9 +89,8 @@ export const markSingleLeadAsRead = asyncHandler(async (req, res) => {
 
 export const markLeadsAsRead = asyncHandler(async (req, res) => {
   await Lead.updateMany({ isRead: { $ne: true } }, { $set: { isRead: true } });
-  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, {}, "Saari leads permanently read mark ho gayi hain"));
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, {}, "All leads marked as read"));
 });
-
 
 export const processAndSendInvoice = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -106,24 +103,22 @@ export const processAndSendInvoice = asyncHandler(async (req, res) => {
   }
 
   let paymentLink = null;
-  let finalAmountToPay = amountToPay;
-  if (finalAmountToPay === undefined) {
-    finalAmountToPay = (invoiceType === 'Proforma Invoice' || invoiceType === 'Quotation') ? lead.price / 2 : lead.price;
-  }
 
-  if (finalAmountToPay > 0 && invoiceType !== 'Receipt') {
-    paymentLink = await createInvoicePaymentLink(lead, finalAmountToPay, invoiceType);
+  if (amountToPay > 0) {
+    paymentLink = await createInvoicePaymentLink(lead, amountToPay, invoiceType);
+    if (paymentLink) {
+      lead.razorpayPaymentId = paymentLink;
+      await lead.save();
+    }
   }
 
   const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${lead._id}`;
-
-  const emailSent = await sendInvoiceEmail(lead, invoiceType, paymentLink, dynamicInvoiceUrl, finalAmountToPay, totalValue);
+  const emailSent = await sendInvoiceEmail(lead, invoiceType, paymentLink, dynamicInvoiceUrl, amountToPay, totalValue);
 
   res.status(StatusCodes.OK).json(
-    new ApiResponse(StatusCodes.OK, { emailSent, paymentLink }, "Invoice & Payment link sent to client successfully!")
+    new ApiResponse(StatusCodes.OK, { emailSent, paymentLink }, "Invoice & Payment link sent successfully!")
   );
 });
-
 
 export const razorpayWebhook = asyncHandler(async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET; 
@@ -138,18 +133,29 @@ export const razorpayWebhook = asyncHandler(async (req, res) => {
     if (req.body.event === 'payment_link.paid') {
       const paymentEntity = req.body.payload.payment_link.entity;
       const referenceId = paymentEntity.reference_id;
+      const leadIdPart = referenceId.split('_')[1];
       
-      const leadId = referenceId.split('_')[1];
-      const lead = await Lead.findById(leadId);
+      const amountPaid = req.body.payload.payment.entity.amount / 100;
+
+      let lead;
+      if (leadIdPart.length === 24) {
+        lead = await Lead.findById(leadIdPart);
+      } else {
+        const allLeads = await Lead.find({});
+        lead = allLeads.find(l => l._id.toString().endsWith(leadIdPart));
+      }
 
       if (lead) {
-        if (lead.status === 'New Lead' || lead.status === 'Discussion' || lead.status === 'Proposal Sent') {
-          lead.status = 'In Progress';
+        lead.advancePaid = (lead.advancePaid || 0) + amountPaid;
+
+        if (lead.advancePaid >= lead.price) {
+          lead.status = 'Completed';
         } else {
-          lead.status = 'Completed'; 
+          lead.status = 'In Progress';
         }
+        
         await lead.save();
-        console.log(`🎉 Payment received for ${lead.name}. Status auto-updated to ${lead.status}!`);
+        console.log(`🎉 Payment of ₹${amountPaid} received for ${lead.name}. Status auto-updated to ${lead.status}!`);
         
         if (lead.notionPageId) {
           await updateNotionLeadStatus(lead.notionPageId, lead.status);

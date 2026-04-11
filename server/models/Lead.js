@@ -11,6 +11,7 @@ const leadSchema = new mongoose.Schema({
   source: { type: String, default: 'website' },
   
   price: { type: Number, default: 0 }, 
+  advancePaid: { type: Number, default: 0 }, 
   portalAccess: { type: Boolean, default: false }, 
   isRead: { type: Boolean, default: false }, 
   

@@ -7,7 +7,8 @@ import {
   updateLeadStatus, 
   markSingleLeadAsRead,
   processAndSendInvoice, 
-  razorpayWebhook 
+  razorpayWebhook,
+  getLeadById
 } from '../controllers/lead.controller.js';
 import { protectAdmin } from '../middleware/auth.middleware.js';
 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post('/', createLead);
 router.get('/', protectAdmin, getLeads);
+router.get('/:id', getLeadById);
 
 router.patch('/:id/status', protectAdmin, updateLeadStatus);
 router.patch('/:id/read', protectAdmin, markSingleLeadAsRead);
@@ -22,7 +24,6 @@ router.patch('/mark-read', protectAdmin, markLeadsAsRead);
 router.patch('/:id/portal-access', protectAdmin, togglePortalAccess);
 
 router.post('/:id/send-invoice', protectAdmin, processAndSendInvoice);
-
 router.post('/webhook/razorpay', razorpayWebhook);
 
 export default router;
