@@ -1,6 +1,5 @@
 import { Client } from '@notionhq/client';
 import logger from '../config/logger.js';
-// ✅ THE FIX: Humara naya Brevo wala function import kar liya
 import { sendEmail } from './email.service.js'; 
 
 export const sendClientConfirmation = async (lead) => {
@@ -43,7 +42,6 @@ export const sendClientConfirmation = async (lead) => {
       </div>
     `;
 
-    // ✅ Naya API function use karke bhej rahe hain
     await sendEmail(lead.email, subjectText, htmlContent);
     return true;
   } catch (error) {
@@ -55,7 +53,7 @@ export const sendClientConfirmation = async (lead) => {
 
 export const sendAdminNotification = async (lead) => {
   try {
-    const subjectText = `✨ NEW LEAD: ${lead.service} - ${lead.name}`;
+    const subjectText = `❤️ NEW LEAD: ${lead.service} - ${lead.name}`;
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #f8fafc;">
         <h2 style="color: #ef4444; margin-top: 0; border-bottom: 2px solid #ef4444; padding-bottom: 10px;"> New Lead Alert</h2>
@@ -102,7 +100,6 @@ export const sendAdminNotification = async (lead) => {
       </div>
     `;
 
-    // ✅ Naya API function use karke Admin ko bhej rahe hain
     await sendEmail(process.env.SMTP_USER, subjectText, htmlContent);
     return true;
   } catch (error) {
