@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
 import logger from '../config/logger.js';
+import dns from 'dns';
+
+dns.setDefaultResultOrder('ipv4first');
 
 export const sendEmail = async (to, subject, htmlContent) => {
   try {
@@ -16,6 +19,7 @@ export const sendEmail = async (to, subject, htmlContent) => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      localAddress: '0.0.0.0',
       tls: {
         rejectUnauthorized: false
       }
