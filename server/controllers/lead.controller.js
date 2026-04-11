@@ -28,8 +28,8 @@ export const createLead = asyncHandler(async (req, res) => {
   const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
   const lead = await Lead.create({ name, email, whatsapp, businessName, websiteUrl, service, message, price: amount });
 
-  onboardingService.sendClientConfirmation(lead);
-  onboardingService.sendAdminNotification(lead);
+  await onboardingService.sendClientConfirmation(lead);
+  await onboardingService.sendAdminNotification(lead);
   
   const notionPageId = await addLeadToNotion(lead, amount, promoDetails);
   if (notionPageId) {
