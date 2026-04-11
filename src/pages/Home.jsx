@@ -50,7 +50,7 @@ export default function Home() {
     { 
       name: 'Suryanshu Kumar Nayak', 
       role: 'COO, XR System', 
-      image: siteSettings?.team?.suryanshuNayak || null,
+      image: siteSettings?.team?.monuNayak || null,
       text: 'We believe in building long-term relationships with our clients by providing exceptional support and innovative technology.' 
     },
     { 
