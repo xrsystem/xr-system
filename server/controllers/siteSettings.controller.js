@@ -1,4 +1,5 @@
 import SiteSettings from '../models/SiteSettings.js';
+import { uploadToCloudinary } from '../middleware/upload.middleware.js';
 
 export const getSiteSettings = async (req, res) => {
   try {
@@ -20,11 +21,12 @@ export const updateSettingImage = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "Please upload an image" });
     }
-    const url = req.file.path;
 
     if (!field) {
       return res.status(400).json({ success: false, message: "Field path missing" });
     }
+
+    const url = await uploadToCloudinary(req.file.path);
 
     let settings = await SiteSettings.findOne();
     if (!settings) settings = new SiteSettings();

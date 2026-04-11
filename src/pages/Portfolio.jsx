@@ -5,19 +5,23 @@ import { cn } from '../lib/utils';
 import SEO from '../components/SEO';
 import axios from 'axios';
 
-const categories = ['All', 'Web Development', 'UI/UX Design', 'SEO', 'Digital Marketing', 'E-commerce'];
-
 export default function Portfolio() {
   const [filter, setFilter] = useState('All');
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [categories, setCategories] = useState(['All']);
 
   useEffect(() => {
     const fetchActiveProjects = async () => {
       try {
         const response = await axios.get('/api/portfolio');
         if (response.data?.data?.projects) {
-          setProjects(response.data.data.projects);
+          const fetchedProjects = response.data.data.projects;
+          setProjects(fetchedProjects);
+          
+          const uniqueCats = ['All', ...new Set(fetchedProjects.map(p => p.category).filter(Boolean))];
+          setCategories(uniqueCats);
         }
       } catch (error) {
         console.error("Failed to fetch active projects:", error);
@@ -47,25 +51,27 @@ export default function Portfolio() {
           </p>
         </div>
 
-        <div className="relative -mx-6 px-6 md:mx-0 md:px-0 mb-12 md:mb-16">
-          <div 
-            className="flex md:flex-wrap md:justify-center gap-3 md:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={cn(
-                  "whitespace-nowrap shrink-0 snap-start px-6 py-2.5 rounded-full text-sm font-semibold transition-all",
-                  filter === cat ? "bg-brand-600 text-white shadow-lg shadow-brand-600/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
+        {categories.length > 1 && !loading && (
+          <div className="relative -mx-6 px-6 md:mx-0 md:px-0 mb-12 md:mb-16">
+            <div 
+              className="flex md:flex-wrap md:justify-center gap-3 md:gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={cn(
+                    "whitespace-nowrap shrink-0 snap-start px-6 py-2.5 rounded-full text-sm font-semibold transition-all",
+                    filter === cat ? "bg-brand-600 text-white shadow-lg shadow-brand-600/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {loading ? (
           <div className="text-center py-20 flex flex-col items-center justify-center">
@@ -76,7 +82,7 @@ export default function Portfolio() {
           <div className="bg-white p-12 rounded-4xl border border-slate-100 text-center shadow-sm max-w-2xl mx-auto">
              <Briefcase className="mx-auto h-12 w-12 text-slate-300 mb-4" />
              <h3 className="text-xl font-bold text-slate-900 mb-2">No projects found</h3>
-             <p className="text-slate-500">Check back later for exciting new work in this category!</p>
+             <p className="text-slate-500">We are updating our portfolio. Check back soon for exciting new work!</p>
           </div>
         ) : (
           <motion.layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

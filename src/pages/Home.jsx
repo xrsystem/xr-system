@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Star, Zap, Shield, Heart, Trophy, Layout, Code, Search, Rocket, Check, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Star, Zap, Shield, Heart, Trophy, Layout, Code, Search, Rocket, Check, ShoppingCart, ChevronLeft, ChevronRight, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
 import axios from 'axios'; 
@@ -10,6 +10,7 @@ export default function Home() {
   const scrollRef = useRef(null);
   
   const [siteSettings, setSiteSettings] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     axios.get('/api/site-settings')
@@ -18,7 +19,10 @@ export default function Home() {
           setSiteSettings(res.data.settings);
         }
       })
-      .catch(err => console.error("Error fetching settings:", err));
+      .catch(err => console.error("Error fetching settings:", err))
+      .finally(() => {
+        setIsLoading(false); 
+      });
   }, []);
 
   const scroll = (direction) => {
@@ -40,25 +44,25 @@ export default function Home() {
     { 
       name: 'JS Mahato', 
       role: 'Founder, XR System', 
-      image: siteSettings?.team?.jsMahato || 'https://picsum.photos/seed/jsmahato/600/800',
+      image: siteSettings?.team?.jsMahato || null,
       text: 'We are committed to delivering high-quality digital solutions that drive real business growth for our clients in Ranchi and beyond.' 
     },
     { 
       name: 'Suryanshu Kumar Nayak', 
       role: 'COO, XR System', 
-      image: siteSettings?.team?.suryanshuNayak || 'https://res.cloudinary.com/dayu6wld9/image/upload/v1775837488/xr_system_portfolio/a8w26klcmxs5faexg2eg.png',
+      image: siteSettings?.team?.suryanshuNayak || null,
       text: 'We believe in building long-term relationships with our clients by providing exceptional support and innovative technology.' 
     },
     { 
       name: 'Chandi Charan Sahu', 
       role: 'CTO, XR System', 
-      image: siteSettings?.team?.chandiSahu || 'https://picsum.photos/seed/chandi/600/800',
+      image: siteSettings?.team?.chandiSahu || null,
       text: 'Our technical vision is built on scalable architecture, ensuring we deliver robust, secure, and future-proof software to all our clients.' 
     },
     { 
       name: 'Priyanshu Gupta', 
       role: 'CFO, XR System', 
-      image: siteSettings?.team?.priyanshuGupta || 'https://picsum.photos/seed/priyanshu/600/800',
+      image: siteSettings?.team?.priyanshuGupta || null,
       text: 'Our focus on affordability and quality makes us the preferred choice for businesses looking to establish a strong online presence.' 
     },
   ];
@@ -102,6 +106,14 @@ export default function Home() {
     { number: '03', title: 'Review & Launch', desc: 'We refine the product based on your feedback and go live.' },
     { number: '04', title: 'Ongoing Support', desc: 'We provide continuous maintenance and updates.' },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-10 h-10 animate-spin text-brand-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">
@@ -188,7 +200,6 @@ export default function Home() {
             <button 
               onClick={() => scroll('left')}
               className="hidden md:flex absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white border border-slate-200 items-center justify-center text-slate-600 hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all shadow-xl opacity-0 group-hover/slider:opacity-100 active:scale-95"
-              aria-label="Scroll Left"
             >
               <ChevronLeft size={24} />
             </button>
@@ -196,7 +207,6 @@ export default function Home() {
             <button 
               onClick={() => scroll('right')}
               className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white border border-slate-200 items-center justify-center text-slate-600 hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all shadow-xl opacity-0 group-hover/slider:opacity-100 active:scale-95"
-              aria-label="Scroll Right"
             >
               <ChevronRight size={24} />
             </button>
@@ -283,8 +293,16 @@ export default function Home() {
             </div>
             
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden shadow-2xl">
-                <img src={siteSettings?.homeBanner || "https://res.cloudinary.com/dayu6wld9/image/upload/v1775764130/xr_system_portfolio/cm914wghdvynsuwfmswr.png"} alt="Our Team" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            
+              <div className="rounded-3xl overflow-hidden shadow-2xl bg-slate-200 h-125 flex items-center justify-center relative">
+                {siteSettings?.homeBanner ? (
+                  <img src={siteSettings.homeBanner} alt="XR System Banner" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="absolute inset-0 bg-linear-to-br from-brand-600 to-slate-900 flex flex-col items-center justify-center text-white/50">
+                    <ImageIcon size={64} className="mb-4 opacity-50" />
+                    <p className="font-display font-bold tracking-widest uppercase">Update Banner in Admin</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -314,9 +332,16 @@ export default function Home() {
                   <p className="mb-8 text-base leading-relaxed font-light">&quot;{t.text}&quot;</p>
                 </div>
                 <div className="flex items-center gap-4 not-italic mt-auto">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0">
-                    <img src={t.image} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  
+                  
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0 bg-brand-50 flex items-center justify-center">
+                    {t.image ? (
+                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <span className="text-brand-600 font-bold text-lg">{t.name.charAt(0)}</span>
+                    )}
                   </div>
+
                   <div>
                     <p className="font-display font-bold text-slate-900 tracking-tight text-sm line-clamp-1">{t.name}</p>
                     <p className="text-[10px] text-brand-600 font-bold uppercase tracking-widest">{t.role}</p>

@@ -3,49 +3,13 @@ import { motion } from 'motion/react';
 import { 
   Check, ArrowRight, CheckCircle2, Zap, Search, Layout, HelpCircle, 
   AlertTriangle, FileText, CreditCard, RefreshCw, Plus, Code2, 
-  ShoppingCart, Palette, BarChart3, Star, Loader2, Trophy
+  ShoppingCart, Palette, BarChart3, Star, Loader2, Trophy, PackageX
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import QuoteModal from '../components/QuoteModal';
 import axios from 'axios';
 
 const iconMap = { 'Plus': Plus, 'Search': Search, 'Layout': Layout, 'Zap': Zap, 'FileText': FileText };
-
-const dummyData = [
-  { _id: 'w1', name: 'Basic', price: 9999, originalPrice: 14999, discountBadge: 'SAVE 33%', category: 'Web Development', description: 'Target: Local shops / small businesses', features: ['4–5 Pages Website', 'Mobile Responsive', 'Basic UI Design', 'Contact Form', 'Free Hosting Setup'], isPopular: false },
-  { _id: 'w2', name: 'Pro', price: 29999, originalPrice: 39999, discountBadge: 'SAVE 25%', category: 'Web Development', description: 'Target: Startups / growing businesses', features: ['8–12 Pages Website', 'Custom UI/UX Design', 'SEO-friendly structure', 'Admin Panel (basic CMS)', 'Speed Optimization', '1 Month Support'], isPopular: true },
-  { _id: 'w3', name: 'Premium', price: 79999, category: 'Web Development', description: 'Target: Serious businesses / funded startups', features: ['Fully Custom Website', 'Advanced UI/UX', 'API Integration', 'Dashboard / Login System', 'Performance + Security', '3 Months Support'], isPopular: false },
-  
-  { _id: 's1', name: 'Basic', price: 5999, category: 'SEO', description: 'Monthly subscription', features: ['10 Keywords optimization', 'On-page SEO', 'Basic blog (2/month)', 'Google indexing'], isPopular: false },
-  { _id: 's2', name: 'Pro', price: 12999, category: 'SEO', description: 'Monthly subscription', features: ['25 Keywords', 'Technical SEO', '6 Blogs/month', 'Competitor analysis', 'Backlink strategy'], isPopular: true },
-  { _id: 's3', name: 'Premium', price: 24999, category: 'SEO', description: 'Monthly subscription', features: ['50+ Keywords', 'Advanced SEO + AI Content', '12 Blogs/month', 'High-quality backlinks', 'Monthly growth report'], isPopular: false },
-  
-  { _id: 'u1', name: 'Basic', price: 4999, category: 'UI/UX Design', description: 'Starting price', features: ['3–5 Screens', 'Basic Wireframe', 'Figma Design'], isPopular: false },
-  { _id: 'u2', name: 'Pro', price: 14999, category: 'UI/UX Design', description: 'Starting price', features: ['10–15 Screens', 'Interactive Design', 'Design System', 'UX improvements'], isPopular: true },
-  { _id: 'u3', name: 'Premium', price: 39999, category: 'UI/UX Design', description: 'Starting price', features: ['Full Product Design', 'UX Research', 'Prototyping + Testing', 'Developer handoff'], isPopular: false },
-  
-  { _id: 'd1', name: 'Basic', price: 6999, category: 'Digital Marketing', description: 'Monthly subscription', features: ['2 Platforms (FB + IG)', '8 Posts/month', 'Basic Ads Setup'], isPopular: false },
-  { _id: 'd2', name: 'Pro', price: 14999, category: 'Digital Marketing', description: 'Monthly subscription', features: ['3 Platforms', '20 Posts/month', 'Paid Ads + Strategy', 'Lead Generation'], isPopular: true },
-  { _id: 'd3', name: 'Premium', price: 29999, category: 'Digital Marketing', description: 'Monthly subscription', features: ['Full Marketing Funnel', 'Ads Optimization', 'Reels + Content Strategy', 'Conversion Tracking'], isPopular: false },
-  
-  { _id: 'e1', name: 'Basic', price: 19999, category: 'E-commerce', description: 'Starting price', features: ['Shopify / WooCommerce setup', '10 Products', 'Payment Gateway'], isPopular: false },
-  { _id: 'e2', name: 'Pro', price: 49999, category: 'E-commerce', description: 'Starting price', features: ['50 Products', 'Custom Design', 'SEO + Marketing setup'], isPopular: true },
-  { _id: 'e3', name: 'Premium', price: 100000, category: 'E-commerce', description: 'Starting price', features: ['Full E-commerce system (MERN)', 'Advanced filters', 'Automation + CRM', 'Performance optimization'], isPopular: false },
-  
-  { _id: 'm1', name: 'Basic Care', price: 1999, category: 'Maintenance', description: 'For small websites', features: ['Hosting Management', 'Weekly Backup', 'Minor Bug Fixes', 'Uptime Monitoring'], isPopular: false },
-  { _id: 'm2', name: 'Growth Care', price: 4999, category: 'Maintenance', description: 'For growing businesses', features: ['Everything in Basic', 'Monthly Updates', 'Speed Optimization', 'Security Checks', '2 Content Updates'], isPopular: true },
-  { _id: 'm3', name: 'Pro Care', price: 9999, category: 'Maintenance', description: 'For serious clients', features: ['Everything in Growth', 'Priority Support', 'Unlimited Minor Changes', 'SEO Monitoring', 'Performance Reports'], isPopular: false },
-  
-  { _id: 'c1', name: 'Startup Combo', price: 19999, category: 'Combo Plans', description: 'High Conversion Package', features: ['Website (Basic)', '1 Month SEO', '1 Month Maintenance'], isPopular: false },
-  { _id: 'c2', name: 'Growth Combo', price: 49999, category: 'Combo Plans', description: 'High Conversion Package', features: ['Website (Pro)', 'SEO (1 month)', 'Digital Marketing (1 month)'], isPopular: true },
-  { _id: 'c3', name: 'Business Combo', price: 99999, category: 'Combo Plans', description: 'High Conversion Package', features: ['Premium Website', 'Full Marketing', '3 Months Maintenance'], isPopular: false },
-
-  { _id: 'a1', name: 'Extra Page', price: 2000, category: 'Add-on', iconName: 'Plus' },
-  { _id: 'a2', name: 'SEO Audit', price: 5000, category: 'Add-on', iconName: 'Search' },
-  { _id: 'a3', name: 'Hosting Setup', price: 3000, category: 'Add-on', iconName: 'Layout' },
-  { _id: 'a4', name: 'Logo Design', price: 4500, category: 'Add-on', iconName: 'Zap' },
-  { _id: 'a5', name: 'Content Writing', price: 1500, category: 'Add-on', iconName: 'FileText' }
-];
 
 export default function Pricing() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
@@ -57,16 +21,14 @@ export default function Pricing() {
     const fetchActivePlans = async () => {
       try {
         const response = await axios.get('/api/pricing');
-        if (response.data?.data?.plans && response.data.data.plans.length > 0) {
-          const dbPlans = response.data.data.plans;
-          const mergedPlans = [...dbPlans, ...dummyData.filter(dp => !dbPlans.some(ap => ap.category === dp.category))];
-          setPlans(mergedPlans);
+        if (response.data?.data?.plans) {
+          setPlans(response.data.data.plans);
         } else {
-          setPlans(dummyData);
+          setPlans([]);
         }
       } catch (error) {
         console.error("Failed to fetch plans", error);
-        setPlans(dummyData);
+        setPlans([]);
       } finally {
         setLoading(false);
       }
@@ -80,6 +42,7 @@ export default function Pricing() {
   };
 
   const getPlans = (cat) => plans.filter(p => p.category === cat);
+  
   const webPlans = getPlans('Web Development');
   const seoPlans = getPlans('SEO');
   const uiuxPlans = getPlans('UI/UX Design');
@@ -137,7 +100,7 @@ export default function Pricing() {
         </div>
 
         <ul className="space-y-4 mb-12 flex-1">
-          {plan.features.map((feature, idx) => (
+          {plan.features?.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-3 text-slate-600 text-sm font-medium">
               <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${plan.isPopular ? 'bg-brand-100 text-brand-600' : 'bg-slate-50 text-slate-400'}`}>
                 <Check size={12} strokeWidth={3} />
@@ -192,7 +155,22 @@ export default function Pricing() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-brand-600 mb-4" /><p className="text-slate-500 font-medium">Loading pricing plans...</p></div>
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-brand-600 mb-4" />
+            <p className="text-slate-500 font-medium">Loading pricing plans...</p>
+          </div>
+        ) : plans.length === 0 ? (
+          <div className="bg-white p-12 rounded-4xl border border-slate-100 text-center shadow-sm max-w-2xl mx-auto mb-32">
+             <PackageX className="mx-auto h-12 w-12 text-slate-300 mb-4" />
+             <h3 className="text-xl font-bold text-slate-900 mb-2">Custom Pricing Only</h3>
+             <p className="text-slate-500 mb-8">We are currently updating our standard packages. Please request a custom quote for your requirements.</p>
+             <button 
+               onClick={() => openQuote({ name: 'Custom Inquiry', category: 'General', price: 0 })}
+               className="bg-brand-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-brand-700 transition-all inline-flex items-center gap-2"
+             >
+               Request Custom Quote <ArrowRight size={18} />
+             </button>
+          </div>
         ) : (
           <>
             <PricingSection title="Web Development Packages" icon={Code2} data={webPlans} />
@@ -378,7 +356,6 @@ export default function Pricing() {
 
         <div className="mt-32 text-center">
           <h2 className="text-3xl lg:text-5xl font-display font-bold text-slate-900 mb-8 tracking-tight">Ready to start your project?</h2>
-          {/* ✨ FIX: Yahan 'Custom Inquiry' ek object ki tarah bheja hai jisme price 0 hai, taaki error na aaye */}
           <button 
             onClick={() => openQuote({ name: 'Custom Inquiry', category: 'General', price: 0 })}
             className="bg-brand-600 text-white px-12 py-5 rounded-2xl font-bold text-lg hover:bg-brand-700 transition-all shadow-2xl shadow-brand-600/20 flex items-center gap-3 mx-auto"
