@@ -163,7 +163,7 @@ export default function Careers() {
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-10 transition-transform group-hover:scale-150 duration-500" />
                   
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                     <div className="md:w-3/4">
                       <div className="flex flex-wrap items-center gap-3 mb-3">
                         <h3 className="text-2xl font-bold text-slate-900 group-hover:text-brand-600 transition-colors tracking-tight">{job.title}</h3>
@@ -176,7 +176,7 @@ export default function Careers() {
                         <span className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg"><GraduationCap size={14} className="text-brand-500" /> {job.experience}</span>
                       </div>
                       
-                      <p className="text-slate-600 text-sm leading-relaxed max-w-3xl font-medium">{job.description}</p>
+                      <p className="text-slate-600 text-sm leading-relaxed max-w-3xl font-medium whitespace-pre-wrap">{job.description}</p>
                     </div>
                     
                     <div className="md:w-1/4 flex md:justify-end mt-4 md:mt-0">

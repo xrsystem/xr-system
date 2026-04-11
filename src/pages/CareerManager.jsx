@@ -109,7 +109,8 @@ export default function CareerManager() {
               <option value="INTERNSHIP">INTERNSHIP</option>
             </select>
           </div>
-          <textarea placeholder="Job Description (Looking for a hungry React developer...)" required rows="3" value={newJob.description} onChange={(e) => setNewJob({...newJob, description: e.target.value})} className="border p-2 rounded-lg w-full"></textarea>
+          {/* ✅ FIX: Yahan rows="3" ko badal kar rows="8" kar diya taaki lamba text likhne mein aasaani ho */}
+          <textarea placeholder="Job Description (Looking for a hungry React developer...)" required rows="8" value={newJob.description} onChange={(e) => setNewJob({...newJob, description: e.target.value})} className="border p-2 rounded-lg w-full"></textarea>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
             <button type="submit" disabled={submitting} className="px-4 py-2 bg-brand-600 text-white rounded-lg disabled:opacity-50">
