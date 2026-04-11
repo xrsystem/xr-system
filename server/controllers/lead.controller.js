@@ -115,7 +115,7 @@ export const processAndSendInvoice = asyncHandler(async (req, res) => {
     paymentLink = await createInvoicePaymentLink(lead, finalAmountToPay, invoiceType);
   }
 
-  const dynamicInvoiceUrl = `https://xrsystem.com/invoice/${lead._id}`;
+  const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${lead._id}`;
 
   const emailSent = await sendInvoiceEmail(lead, invoiceType, paymentLink, dynamicInvoiceUrl, finalAmountToPay, totalValue);
 
