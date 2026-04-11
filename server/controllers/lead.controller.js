@@ -23,10 +23,14 @@ const getPlanAmount = (service, source) => {
 };
 
 export const createLead = asyncHandler(async (req, res) => {
-  const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails } = req.body;
+  const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails, advancePaid } = req.body;
   const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
   
-  const lead = await Lead.create({ name, email, whatsapp, businessName, websiteUrl, service, message, price: amount, advancePaid: 0 });
+  const lead = await Lead.create({ 
+    name, email, whatsapp, businessName, websiteUrl, service, message, 
+    price: amount, 
+    advancePaid: advancePaid ? Number(advancePaid) : 0 
+  });
 
   await onboardingService.sendClientConfirmation(lead);
   await onboardingService.sendAdminNotification(lead);
@@ -118,6 +122,22 @@ export const processAndSendInvoice = asyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(
     new ApiResponse(StatusCodes.OK, { emailSent, paymentLink }, "Invoice & Payment link sent successfully!")
   );
+});
+
+export const logOfflinePayment = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { amount } = req.body;
+  const lead = await Lead.findById(id);
+  
+  if (!lead) { res.status(StatusCodes.NOT_FOUND); throw new Error("Lead not found"); }
+  
+  lead.advancePaid = (lead.advancePaid || 0) + Number(amount);
+  
+  if (lead.advancePaid >= lead.price) { lead.status = 'Completed'; } 
+  else { lead.status = 'In Progress'; }
+  
+  await lead.save();
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, "Payment logged successfully"));
 });
 
 export const razorpayWebhook = asyncHandler(async (req, res) => {
