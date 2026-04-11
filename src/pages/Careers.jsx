@@ -59,20 +59,22 @@ export default function Careers() {
     setSubmitting(true);
     setSubmitStatus(null);
     try {
-      const res = await fetch('/api/careers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, role: selectedJob.title }),
+      const res = await axios.post('/api/careers', { 
+        ...formData, 
+        role: selectedJob.title 
       });
-      if (res.ok) {
+      
+      if (res.status === 200 || res.status === 201) {
         setSubmitStatus({ type: 'success', message: 'Application sent! We will review your portfolio.' });
         setFormData({ name: '', email: '', whatsapp: '', portfolioUrl: '', resumeUrl: '', message: '' });
         setTimeout(() => setIsApplyModalOpen(false), 3000);
-      } else {
-        setSubmitStatus({ type: 'error', message: 'Something went wrong.' });
       }
     } catch (err) {
-      setSubmitStatus({ type: 'error', message: 'Network error.' });
+      console.error('Career Form Error:', err.response?.data || err.message);
+      setSubmitStatus({ 
+        type: 'error', 
+        message: err.response?.data?.message || 'Something went wrong. Please check your connection.' 
+      });
     } finally {
       setSubmitting(false);
     }

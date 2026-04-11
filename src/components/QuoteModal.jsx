@@ -70,6 +70,7 @@ export default function QuoteModal({ isOpen, onClose, selectedPlan }) {
     }
 
     try {
+      // ✅ FETCH KO HATA KAR AXIOS LAGA DIYA
       const res = await axios.post('/api/leads', {
         ...formData,
         service: serviceName,
@@ -86,11 +87,10 @@ export default function QuoteModal({ isOpen, onClose, selectedPlan }) {
           setPromoStatus({ type: '', message: '', value: null });
           onClose();
         }, 5000);
-      } else {
-         throw new Error('Something went wrong');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to submit request. Please try again.');
+      console.error('Lead Submit Error:', err.response?.data || err.message);
+      setError(err.response?.data?.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
     }
