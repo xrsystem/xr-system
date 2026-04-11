@@ -1,8 +1,5 @@
 import nodemailer from 'nodemailer';
 import logger from '../config/logger.js';
-import dns from 'dns';
-
-dns.setDefaultResultOrder('ipv4first');
 
 export const sendEmail = async (to, subject, htmlContent) => {
   try {
@@ -19,10 +16,6 @@ export const sendEmail = async (to, subject, htmlContent) => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      localAddress: '0.0.0.0',
-      tls: {
-        rejectUnauthorized: false
-      }
     });
 
     const mailOptions = {
@@ -55,15 +48,6 @@ export const sendPortalLink = async (to, name, notionUrl) => {
           Open My Dashboard
         </a>
       </div>
-      
-      <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #4F46E5;">
-        <p style="margin: 0; color: #475569; font-size: 14px;">
-          <strong>Security Note:</strong> This is a unique private link. Please do not share it with anyone outside your team.
-        </p>
-      </div>
-
-      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
-      <p style="color: #94a3b8; font-size: 12px; text-align: center;">XR System • Digital Solutions & Transparency</p>
     </div>
   `;
   return await sendEmail(to, subject, htmlContent);
