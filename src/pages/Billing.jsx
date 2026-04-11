@@ -222,7 +222,7 @@ export default function Billing() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(...secondary);
-    doc.text("Software Development Agency\nRanchi, Jharkhand, India - 834001\nGSTIN: 20XXXXX1234X1ZX", 20, y + 11);
+    doc.text("IT Service Company\nRanchi, Jharkhand, India - 834001\nGSTIN: ", 20, y + 11);
     
     let clientAddressText = invoiceData.clientName + "\n" + invoiceData.email;
     if (invoiceData.address) clientAddressText += "\n" + doc.splitTextToSize(invoiceData.address, 55).join("\n");
@@ -344,7 +344,7 @@ export default function Billing() {
     doc.text("PAYMENT DETAILS", 20, leftY);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...primary);
-    doc.text("HDFC Bank | A/C Name: XR System\nA/C No: 50100XXXXXXXXX | IFSC: HDFC0001234\nPayment Method: UPI / IMPS / Razorpay", 20, leftY + 5);
+    doc.text("Jio Payment Bank | A/C Name: XR System\nA/C No: 001521711568284 | IFSC: JIOP0000001\nPayment Method: UPI / IMPS / Razorpay", 20, leftY + 5);
     
     doc.setFont("helvetica", "italic");
     doc.setTextColor(220, 38, 38);
@@ -466,7 +466,7 @@ export default function Billing() {
                 <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                   <FileText className="text-brand-600" /> Dynamic Invoice Generator
                 </h2>
-                <p className="text-sm text-slate-500 mt-1">Configure multi-item billing, discounts, and Apple-grade premium PDFs.</p>
+                <p className="text-sm text-slate-500 mt-1">XR SYSTEM BILLING DASHBOARD</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
