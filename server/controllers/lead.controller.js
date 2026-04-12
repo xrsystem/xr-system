@@ -6,6 +6,7 @@ import * as onboardingService from '../services/onboarding.service.js';
 import { addLeadToNotion, updateNotionPortalAccess, updateNotionLeadStatus } from '../services/notion.service.js';
 import crypto from 'crypto';
 import { createInvoicePaymentLink, sendInvoiceEmail } from '../services/billing.service.js';
+import cron from 'node-cron';
 
 const getPlanAmount = (service, source) => {
   if (source === 'contact') return 0; 
@@ -170,6 +171,14 @@ export const razorpayWebhook = asyncHandler(async (req, res) => {
 
         if (lead.advancePaid >= lead.price) {
           lead.status = 'Completed';
+          
+          if (lead.service.toLowerCase().includes('monthly') && !lead.nextBillingDate) {
+             const nextDate = new Date();
+             nextDate.setMonth(nextDate.getMonth() + 1);
+             lead.nextBillingDate = nextDate;
+             console.log(`📅 Monthly Sub Started. Next billing on: ${nextDate.toDateString()}`);
+          }
+          
         } else {
           lead.status = 'In Progress';
         }
@@ -185,5 +194,50 @@ export const razorpayWebhook = asyncHandler(async (req, res) => {
     res.status(200).json({ status: "ok" });
   } else {
     res.status(400).json({ status: "invalid signature" });
+  }
+});
+
+
+cron.schedule('0 8 * * *', async () => {
+  try {
+    console.log("🔄 Running Daily Subscription Billing Check...");
+    const today = new Date();
+    
+    const dueSubscriptions = await Lead.find({
+      service: { $regex: /monthly/i },
+      status: 'Completed',
+      nextBillingDate: { $lte: today }
+    });
+
+    for (const sub of dueSubscriptions) {
+      console.log(`Generating monthly invoice for ${sub.name}...`);
+      
+      const newInvoice = await Lead.create({
+        name: sub.name,
+        email: sub.email,
+        whatsapp: sub.whatsapp,
+        businessName: sub.businessName,
+        service: sub.service + ` (Renewal - ${today.toLocaleString('default', { month: 'short', year: 'numeric' })})`,
+        price: sub.price,
+        advancePaid: 0,
+        status: 'In Progress'
+      });
+
+      const paymentLink = await createInvoicePaymentLink(newInvoice, newInvoice.price, "Subscription Receipt (Monthly Plan)");
+      if (paymentLink) {
+        newInvoice.razorpayPaymentId = paymentLink;
+        await newInvoice.save();
+      }
+
+      const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${newInvoice._id}`;
+      await sendInvoiceEmail(newInvoice, "Subscription Receipt (Monthly Plan)", paymentLink, dynamicInvoiceUrl, newInvoice.price, newInvoice.price);
+
+      sub.nextBillingDate = new Date(new Date().setMonth(today.getMonth() + 1));
+      await sub.save();
+      
+      console.log(`✅ Auto-billed ${sub.name} successfully!`);
+    }
+  } catch (error) {
+    console.error("❌ Cron Job Error:", error);
   }
 });

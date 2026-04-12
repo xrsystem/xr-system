@@ -17,6 +17,8 @@ const leadSchema = new mongoose.Schema({
   
   status: { type: String, default: 'New Lead' },
   
+  nextBillingDate: { type: Date },
+  
   notionPageId: { type: String },
   razorpayPaymentId: { type: String },
   createdAt: { type: Date, default: Date.now }
