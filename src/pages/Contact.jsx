@@ -57,7 +57,7 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-20">
           
-          <div>
+          <div className="order-2 lg:order-1">
             <h1 className="text-5xl lg:text-7xl mb-8">Let's <span className="text-brand-600">Connect</span></h1>
             <p className="text-xl text-slate-600 mb-12 leading-relaxed">
               Have a project in mind, need a logo, or just want to say hi? We'd love to hear from you.
@@ -87,14 +87,14 @@ export default function Contact() {
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
-                allowFullScreen
+                allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
           </div>
 
-          <div className="bg-slate-50 p-10 lg:p-16 rounded-[3rem] border border-slate-100">
+          <div className="bg-slate-50 p-10 lg:p-16 rounded-[3rem] border border-slate-100 order-1 lg:order-2">
             {status === 'success' ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
