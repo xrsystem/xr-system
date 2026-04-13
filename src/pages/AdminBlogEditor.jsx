@@ -29,8 +29,8 @@ export default function AdminBlogEditor() {
         setBlog({ ...blog, coverImage: res.data.secure_url });
       }
     } catch (err) {
-      console.error("Image upload failed:", err);
-      alert("Image upload fail ho gaya. Backend console check karo.");
+      console.error("Upload failed:", err);
+      alert("Image upload fail ho gaya.");
     } finally {
       setUploadingImage(false);
     }
@@ -44,8 +44,11 @@ export default function AdminBlogEditor() {
         headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
       });
       navigate('/admin/blogs');
-    } catch (err) { alert("Error saving blog"); }
-    finally { setSaving(false); }
+    } catch (err) { 
+      alert("Error saving blog"); 
+    } finally { 
+      setSaving(false); 
+    }
   };
 
   return (
@@ -88,7 +91,7 @@ export default function AdminBlogEditor() {
             />
             <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 ${uploadingImage ? 'bg-slate-50 text-slate-400' : 'bg-white hover:bg-slate-50 text-slate-700'} transition-colors`}>
               {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <ImageIcon size={16} />}
-              {uploadingImage ? "Uploading..." : blog.coverImage ? "Change Cover" : "Upload Cover"}
+              {uploadingImage ? "Uploading..." : blog.coverImage ? "Change Cover Image" : "Upload Cover Image"}
             </div>
           </div>
           
