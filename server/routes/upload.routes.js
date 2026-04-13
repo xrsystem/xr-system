@@ -19,3 +19,4 @@ router.post('/', protectAdmin, upload.single('image'), async (req, res) => {
   }
 });
 
+export default router;
