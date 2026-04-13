@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, Star, Zap, Shield, Heart, Trophy, Layout, Code, Search, Rocket, Check, ShoppingCart, ChevronLeft, ChevronRight, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
+import { Helmet } from 'react-helmet-async'; 
 import axios from 'axios'; 
 import SEO from '../components/SEO';
 
@@ -123,6 +124,38 @@ export default function Home() {
         keywords="Website Development Company in Ranchi, Web Design Company in Ranchi, SEO Services in Ranchi Jharkhand, Digital Marketing Company in Ranchi, UI UX Design Services Ranchi, E-commerce Website Development Ranchi, XR System"
       />
       
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "XR System",
+            "image": "https://xrsystem.in/assets/logo.png",
+            "@id": "https://xrsystem.in/",
+            "url": "https://xrsystem.in/",
+            "telephone": "+919110047180",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Lower Burdwan Compound, Lalpur",
+              "addressLocality": "Ranchi",
+              "addressRegion": "Jharkhand",
+              "postalCode": "834001",
+              "addressCountry": "IN"
+            },
+            "priceRange": "₹₹",
+            "sameAs": [
+              "https://x.com/xrsystem",
+              "https://www.linkedin.com/company/xrsystem/",
+              "https://github.com/xrsystem",
+              "https://www.instagram.com/xrsystem2026?igsh=dGhoa2NzdG9hYThj",
+              "https://facebook.com/xrsystem",
+              "https://youtube.com/@xrsystem",
+              "https://reddit.com/user/xrsystem"
+            ]
+          })}
+        </script>
+      </Helmet>
+
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6 overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.1),transparent_50%)]" />
@@ -336,7 +369,7 @@ export default function Home() {
                   
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0 bg-brand-50 flex items-center justify-center">
                     {t.image ? (
-                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
                     ) : (
                       <span className="text-brand-600 font-bold text-lg">{t.name.charAt(0)}</span>
                     )}

@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, ChevronDown } from 'lucide-react';
 import { cn } from '../lib/utils';
 import SEO from '../components/SEO';
-// 1. Axios import karna zaroori hai
 import axios from 'axios';
 
 export default function Contact() {
@@ -32,14 +31,11 @@ export default function Contact() {
     setStatus('loading');
     
     try {
-      // 2. Fetch ki jagah Axios ka istemal
-      // Ye automatically App.jsx mein set kiye gaye VITE_API_URL ko use karega
       const res = await axios.post('/api/leads', { 
         ...formState, 
         source: 'contact' 
       });
       
-      // 3. Status check (Axios mein res.status hota hai)
       if (res.status === 200 || res.status === 201) {
         setStatus('success');
         setFormState({ name: '', email: '', whatsapp: '', service: 'General Inquiry', message: '' });
@@ -47,7 +43,6 @@ export default function Contact() {
         setStatus('error');
       }
     } catch (err) {
-      // Backend error console mein dekhne ke liye
       console.error('Contact form error:', err.response?.data || err.message);
       setStatus('error');
     }
@@ -72,7 +67,7 @@ export default function Contact() {
               {[
                 { icon: <Mail size={24} />, title: 'Email Us', value: 'connect@xrsystem.in' },
                 { icon: <Phone size={24} />, title: 'Call Us', value: '+91 9110047180' },
-                { icon: <MapPin size={24} />, title: 'Visit Us', value: 'Lalpur, Ranchi, Jharkhand, India' },
+                { icon: <MapPin size={24} />, title: 'Visit Us', value: 'Lower Burdwan Compound, Lalpur, Ranchi, 834001, Jharkhand.' },
               ].map((item, i) => (
                 <div key={i} className="flex gap-6">
                   <div className="w-14 h-14 rounded-2xl bg-brand-50 flex items-center justify-center text-brand-600 shrink-0">
@@ -88,7 +83,7 @@ export default function Contact() {
 
             <div className="mt-16 rounded-4xl overflow-hidden h-64 bg-slate-100 border border-slate-200">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58632.18182255757!2d85.29742614863281!3d23.369651500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f4e1075306660b%3A0xb33887c2936270b2!2sLalpur%2C%20Ranchi%2C%20Jharkhand!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                src="https://maps.app.goo.gl/RWoqLtS6cjxLgPPh9"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
