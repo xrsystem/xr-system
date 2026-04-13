@@ -88,7 +88,7 @@ export const updateLeadStatus = asyncHandler(async (req, res) => {
 
 export const markSingleLeadAsRead = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const lead = await Lead.findByIdAndUpdate(id, { is_read: true }, { new: true });
+  const lead = await Lead.findByIdAndUpdate(id, { isRead: true }, { new: true });
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, "Lead read marked"));
 });
 
