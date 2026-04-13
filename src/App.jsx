@@ -67,8 +67,6 @@ function AppContent() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="blogs" element={<AdminBlogManager />} />
-          <Route path="blogs/new" element={<AdminBlogEditor />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -80,6 +78,8 @@ function AppContent() {
           <Route path="/xradmin" element={<SecretAdminLogin />} />
 
           <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+           <Route path="blogs" element={<AdminBlogManager />} />
+          <Route path="blogs/new" element={<AdminBlogEditor />} />
 
           <Route path="/admin" element={
             <ProtectedRoute>
