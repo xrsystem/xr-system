@@ -15,6 +15,8 @@ import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import AdminBlogManager from './pages/AdminBlogManager';
 import AdminBlogEditor from './pages/AdminBlogEditor';
 import { PrivacyPolicy, TermsOfService } from './pages/Legal';
@@ -70,6 +72,9 @@ function AppContent() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           
           <Route path="/invoice/:id" element={<Invoice />} />
           

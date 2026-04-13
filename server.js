@@ -24,6 +24,7 @@ import pricingRoutes from './server/routes/pricing.routes.js';
 import couponRoutes from './server/routes/coupon.routes.js';
 import siteSettingsRoutes from './server/routes/siteSettings.routes.js';
 import blogRoutes from './server/routes/blog.routes.js'; 
+import uploadRoutes from './server/routes/upload.routes.js';
 
 console.log("==== ENV PORT CHECK ====", process.env.PORT);
 
@@ -85,6 +86,7 @@ async function startServer() {
   app.use('/api/coupons', couponRoutes);
   app.use('/api/site-settings', siteSettingsRoutes);
   app.use('/api/blogs', blogRoutes);
+  app.use('/api/upload', uploadRoutes);
 
   app.get("/api/health", (req, res) => {
     res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { status: "UP" }, "Server is healthy"));

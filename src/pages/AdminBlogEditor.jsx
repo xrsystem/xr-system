@@ -1,18 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, X, Image as ImageIcon } from 'lucide-react';
+import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
   const [blog, setBlog] = useState({ title: '', excerpt: '', content: '', category: 'Tech', coverImage: '' });
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+      const res = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+        }
+      });
+      
+      if(res.data.success) {
+        setBlog({ ...blog, coverImage: res.data.secure_url });
+      }
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      alert("Image upload fail ho gaya. Backend console check karo.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await axios.post('/api/blogs', blog);
+      await axios.post('/api/blogs', blog, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
+      });
       navigate('/admin/blogs');
     } catch (err) { alert("Error saving blog"); }
     finally { setSaving(false); }
@@ -39,21 +69,32 @@ export default function AdminBlogEditor() {
           onChange={e => setBlog({...blog, title: e.target.value})}
         />
 
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4 items-center">
           <input 
             type="text" 
             placeholder="Category (e.g. SEO, Web)" 
-            className="bg-slate-100 px-4 py-1 rounded-full text-sm outline-none border-none"
+            className="bg-slate-100 px-4 py-2 rounded-xl text-sm outline-none border-none w-48"
             value={blog.category}
             onChange={e => setBlog({...blog, category: e.target.value})}
           />
-          <input 
-            type="text" 
-            placeholder="Cover Image URL" 
-            className="flex-1 bg-slate-50 px-4 py-1 rounded-full text-sm outline-none border border-dashed border-slate-300"
-            value={blog.coverImage}
-            onChange={e => setBlog({...blog, coverImage: e.target.value})}
-          />
+          
+          <div className="relative flex items-center">
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              disabled={uploadingImage}
+            />
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 ${uploadingImage ? 'bg-slate-50 text-slate-400' : 'bg-white hover:bg-slate-50 text-slate-700'} transition-colors`}>
+              {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <ImageIcon size={16} />}
+              {uploadingImage ? "Uploading..." : blog.coverImage ? "Change Cover" : "Upload Cover"}
+            </div>
+          </div>
+          
+          {blog.coverImage && (
+             <img src={blog.coverImage} alt="Cover Preview" className="h-10 w-10 object-cover rounded-lg border border-slate-200 shadow-sm" />
+          )}
         </div>
 
         <textarea 
