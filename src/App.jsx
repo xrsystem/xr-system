@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
+import { AdminProvider } from './context/AdminContext';
 import { Analytics } from '@vercel/analytics/react';
 import axios from 'axios';
 
@@ -77,7 +78,9 @@ function AppContent() {
 
           <Route path="/admin" element={
             <ProtectedRoute>
-              <AdminLayout />
+              <AdminProvider>
+                <AdminLayout />
+              </AdminProvider>
             </ProtectedRoute>
           }>
             <Route index element={<Navigate to="dashboard" replace />} />
