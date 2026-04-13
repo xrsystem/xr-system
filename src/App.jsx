@@ -78,8 +78,6 @@ function AppContent() {
           <Route path="/xradmin" element={<SecretAdminLogin />} />
 
           <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
-           <Route path="blogs" element={<AdminBlogManager />} />
-          <Route path="blogs/new" element={<AdminBlogEditor />} />
 
           <Route path="/admin" element={
             <ProtectedRoute>
@@ -93,6 +91,8 @@ function AppContent() {
             <Route path="crm" element={<CrmLeads />} /> 
             <Route path="cms" element={<ContentManager />} />
             <Route path="billing" element={<Billing />} />
+            <Route path="blogs" element={<AdminBlogManager />} />
+            <Route path="blogs/new" element={<AdminBlogEditor />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
