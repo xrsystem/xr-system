@@ -1,40 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, FileText, Receipt, LogOut, Code2, Bell } from 'lucide-react';
-import axios from 'axios';
+import { AdminContext } from '../context/AdminContext'; // <-- Import kiya
 
 export default function AdminLayout() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [leadCount, setLeadCount] = useState(0);
-
-  const getAuthConfig = () => {
-    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-    return {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true 
-    };
-  };
-
-  useEffect(() => {
-    if (location.pathname === '/admin/crm') {
-      setLeadCount(0);
-      return;
-    }
-
-    const fetchLeadsCount = async () => {
-      try {
-        const response = await axios.get('/api/leads', getAuthConfig());
-        if (response.data?.data?.leads) {
-          const unreadLeads = response.data.data.leads.filter(lead => lead.isRead !== true);
-          setLeadCount(unreadLeads.length);
-        }
-      } catch (error) {
-        console.error("Failed to fetch leads count");
-      }
-    };
-    fetchLeadsCount();
-  }, [location.pathname]);
+  const { unreadLeadsCount } = useContext(AdminContext); // <-- Context se count liya
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -44,7 +15,8 @@ export default function AdminLayout() {
 
   const menuItems = [
     { name: 'Overview', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
-    { name: 'CRM & Leads', icon: <Users size={20} />, path: '/admin/crm', count: leadCount },
+    { name: 'CRM & Leads', icon: <Users size={20} />, path: '/admin/crm', count: unreadLeadsCount },
+    { name: 'Blog Manager', icon: <FileText size={20} />, path: '/admin/blogs' },
     { name: 'Content (CMS)', icon: <FileText size={20} />, path: '/admin/cms' },
     { name: 'Billing', icon: <Receipt size={20} />, path: '/admin/billing' },
   ];
@@ -101,7 +73,7 @@ export default function AdminLayout() {
             
             <NavLink to="/admin/crm" className="relative w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer">
               <Bell size={20} />
-              {leadCount > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>}
+              {unreadLeadsCount > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>}
             </NavLink>
             
             <div className="w-10 h-10 rounded-full bg-brand-100 border-2 border-brand-200 flex items-center justify-center font-bold text-brand-700">XR</div>

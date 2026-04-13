@@ -15,6 +15,8 @@ import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
+import AdminBlogManager from './pages/AdminBlogManager';
+import AdminBlogEditor from './pages/AdminBlogEditor';
 import { PrivacyPolicy, TermsOfService } from './pages/Legal';
 import PaymentSuccess from './pages/PaymentSuccess';
 
@@ -65,6 +67,8 @@ function AppContent() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="blogs" element={<AdminBlogManager />} />
+          <Route path="blogs/new" element={<AdminBlogEditor />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />

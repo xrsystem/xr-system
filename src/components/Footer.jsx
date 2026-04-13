@@ -68,6 +68,7 @@ export default function Footer() {
             <li><Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-brand-400 transition-colors">Home</Link></li>
             <li><Link to="/about" className="hover:text-brand-400 transition-colors">About Us</Link></li>
             <li><Link to="/services" className="hover:text-brand-400 transition-colors">Our Services</Link></li>
+            <li><Link to="/blog" className="hover:text-brand-400 transition-colors">Blog</Link></li>
             <li><Link to="/careers" className="hover:text-brand-400 transition-colors">Careers</Link></li>
             <li><Link to="/contact" className="hover:text-brand-400 transition-colors">Contact</Link></li>
             <li><Link to="/login" className="hover:text-brand-400 transition-colors">Client Portal</Link></li>
@@ -77,9 +78,9 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-semibold mb-6">Services</h4>
           <ul className="space-y-4 text-sm">
-            <li><HashLink smooth to="/services#web-development" className="hover:text-brand-400 transition-colors">Web Development</HashLink></li>
+            <li><HashLink smooth to="/services#web-development" className="hover:text-brand-400 transition-colors">Web Development & Design</HashLink></li>
             <li><HashLink smooth to="/services#ui-ux" className="hover:text-brand-400 transition-colors">UI/UX Design</HashLink></li>
-            <li><HashLink smooth to="/services#seo" className="hover:text-brand-400 transition-colors">SEO & Content</HashLink></li>
+            <li><HashLink smooth to="/services#seo" className="hover:text-brand-400 transition-colors">SEO </HashLink></li>
             <li><HashLink smooth to="/services#digital-marketing" className="hover:text-brand-400 transition-colors">Digital Marketing</HashLink></li>
             <li><HashLink smooth to="/services#ecommerce" className="hover:text-brand-400 transition-colors">E-commerce Solutions</HashLink></li>
           </ul>
