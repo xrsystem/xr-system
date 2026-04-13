@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
+import { Analytics } from '@vercel/analytics/react';
 import axios from 'axios';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
@@ -101,6 +102,7 @@ export default function App() {
         <ErrorBoundary>
           <AuthProvider>
             <AppContent />
+            <Analytics />
           </AuthProvider>
         </ErrorBoundary>
       </HelmetProvider>
