@@ -83,7 +83,7 @@ export default function Contact() {
 
             <div className="mt-16 rounded-4xl overflow-hidden h-64 bg-slate-100 border border-slate-200">
               <iframe
-                src="https://maps.app.goo.gl/RWoqLtS6cjxLgPPh9"
+                src="https://www.google.com/maps/place/23%C2%B022'46.8%22N+85%C2%B020'27.4%22E/@23.379674,85.340951,17z/data=!3m1!4b1!4m4!3m3!8m2!3d23.379674!4d85.340951!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDQwOC4wIKXMDSoASAFQAw%3D%3D"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
