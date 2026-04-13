@@ -31,6 +31,7 @@ import Billing from './pages/Billing';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import WhatsAppButton from './components/WhatsAppButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -93,6 +94,9 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      
+      {!isAuth && <WhatsAppButton />} 
+      
       {!isAuth && <Footer />}
     </div>
   );
