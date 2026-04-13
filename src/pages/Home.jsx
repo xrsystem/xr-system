@@ -119,18 +119,19 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <SEO 
-        title="XR System | Website Development Company in Ranchi, Jharkhand | SEO & Digital Marketing Services" 
-        description="XR System is a leading website development company in Ranchi, Jharkhand offering web design, SEO services, digital marketing, and UI/UX design to help businesses grow online and get more customers." 
-        keywords="Website Development Company in Ranchi, Web Design Company in Ranchi, SEO Services in Ranchi Jharkhand, Digital Marketing Company in Ranchi, UI UX Design Services Ranchi, E-commerce Website Development Ranchi, XR System"
+        title="XR System | Software Service Company in Ranchi, Jharkhand | SEO & Digital Marketing Services" 
+        description="XR System is a leading software service company in Ranchi, Jharkhand offering web design, SEO services, digital marketing, and UI/UX design to help businesses grow online and get more customers." 
+        keywords="Software Service Company, Website Development Company in Ranchi, Web Design Company in Ranchi, SEO Services in Ranchi Jharkhand, Digital Marketing Company in Ranchi, UI UX Design Services Ranchi, E-commerce Website Development Ranchi, XR System"
       />
       
+      {/* SCHEMA MARKUP WITH SOCIAL LINKS & TITLE */}
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             "name": "XR System",
-            "image": "https://xrsystem.in/assets/logo.png",
+            "image": "https://xrsystem.in/favicon.png", 
             "@id": "https://xrsystem.in/",
             "url": "https://xrsystem.in/",
             "telephone": "+919110047180",
@@ -147,10 +148,9 @@ export default function Home() {
               "https://x.com/xrsystem",
               "https://www.linkedin.com/company/xrsystem/",
               "https://github.com/xrsystem",
-              "https://www.instagram.com/xrsystem2026?igsh=dGhoa2NzdG9hYThj",
-              "https://facebook.com/xrsystem",
-              "https://youtube.com/@xrsystem",
-              "https://reddit.com/user/xrsystem"
+              "https://www.instagram.com/xrsystem.in",
+              "https://www.youtube.com/channel/UCy0jrE3QfB4q_dYFnK51-DQ",
+              "https://www.reddit.com/user/XRsystem"
             ]
           })}
         </script>
