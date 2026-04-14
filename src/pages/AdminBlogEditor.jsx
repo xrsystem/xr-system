@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Save, Image as ImageIcon, Loader2, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import JoditEditor from 'jodit-react';
 
@@ -124,13 +124,19 @@ export default function AdminBlogEditor() {
         />
 
         <div className="flex flex-wrap gap-4 items-center">
-          <input 
-            type="text" 
-            placeholder="Category (e.g. SEO, Web)" 
-            className="bg-slate-100 px-4 py-2 rounded-xl text-sm outline-none border-none w-48"
-            value={blog.category}
-            onChange={e => setBlog({...blog, category: e.target.value})}
-          />
+          
+          <div className="relative group">
+            <select 
+              className="appearance-none bg-slate-100 px-4 py-2 pr-10 rounded-xl text-sm font-bold text-slate-700 outline-none border-none cursor-pointer hover:bg-slate-200 transition-colors w-48"
+              value={blog.category}
+              onChange={e => setBlog({...blog, category: e.target.value})}
+            >
+              <option value="Tech">Tech</option>
+              <option value="Growth">Growth</option>
+              <option value="Case Studies">Case Studies</option>
+            </select>
+            <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
           
           <div className="relative flex items-center">
             <input 

@@ -30,7 +30,7 @@ export default function Blog() {
   const categories = [
     { name: 'All', icon: <BookOpen size={16} /> },
     { name: 'Growth', icon: <TrendingUp size={16} /> },
-    { name: 'Tech', icon: <Code2 size={16} /> },
+    { name: 'Engineering', icon: <Code2 size={16} /> },
     { name: 'Case Studies', icon: <Sparkles size={16} /> },
   ];
 
@@ -52,7 +52,7 @@ export default function Blog() {
           </p>
         </div>
 
-        {/*  Category Filters  */}
+        {/* 🟢 Category Filters (Agency Style) */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
           {categories.map((cat) => (
             <button
@@ -70,7 +70,7 @@ export default function Blog() {
           ))}
         </div>
 
-        {/*  Blog List */}
+        {/* 🟢 Blog List */}
         <div className="space-y-20">
           {filteredBlogs && filteredBlogs.length > 0 ? (
             filteredBlogs.map((post) => (
