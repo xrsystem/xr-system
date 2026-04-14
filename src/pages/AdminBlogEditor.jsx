@@ -2,12 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
   const [blog, setBlog] = useState({ title: '', excerpt: '', content: '', category: 'Tech', coverImage: '' });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}],
+      ['link'],
+      ['clean']
+    ],
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -30,7 +42,7 @@ export default function AdminBlogEditor() {
       }
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("Image upload fail ho gaya.");
+      alert("Image upload failed.");
     } finally {
       setUploadingImage(false);
     }
@@ -107,12 +119,16 @@ export default function AdminBlogEditor() {
           onChange={e => setBlog({...blog, excerpt: e.target.value})}
         />
 
-        <textarea 
-          placeholder="Tell your story... (You can use HTML tags here)" 
-          className="w-full text-lg leading-relaxed border-none outline-none min-h-100"
-          value={blog.content}
-          onChange={e => setBlog({...blog, content: e.target.value})}
-        />
+        <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+          <ReactQuill 
+            theme="snow"
+            value={blog.content}
+            onChange={(content) => setBlog({...blog, content})}
+            modules={modules}
+            className="h-100 mb-12"
+            placeholder="Tell your story..."
+          />
+        </div>
       </div>
     </div>
   );

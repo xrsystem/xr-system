@@ -26,6 +26,8 @@ import siteSettingsRoutes from './server/routes/siteSettings.routes.js';
 import blogRoutes from './server/routes/blog.routes.js'; 
 import uploadRoutes from './server/routes/upload.routes.js';
 
+import Blog from './server/models/Blog.js';
+
 console.log("==== ENV PORT CHECK ====", process.env.PORT);
 
 const PORT = process.env.PORT || 3000;
@@ -101,13 +103,46 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
+    
     if (fs.existsSync(distPath)) {
       app.use(express.static(distPath));
     }
-  }
 
-  if (process.env.NODE_ENV === "production") {
-    const distPath = path.join(process.cwd(), "dist");
+    app.get("/blog/:slug", async (req, res) => {
+      try {
+        const { slug } = req.params;
+        const blog = await Blog.findOne({ slug });
+
+        if (!blog) {
+          return res.sendFile(path.join(distPath, "index.html"));
+        }
+
+        let htmlData = fs.readFileSync(path.join(distPath, "index.html"), 'utf8');
+
+        const metaTags = `
+          <title>${blog.title} | XR System</title>
+          <meta name="description" content="${blog.excerpt}" />
+          <meta property="og:title" content="${blog.title} | XR System" />
+          <meta property="og:description" content="${blog.excerpt}" />
+          <meta property="og:image" content="${blog.coverImage}" />
+          <meta property="og:url" content="https://xrsystem.in/blog/${blog.slug}" />
+          <meta property="og:type" content="article" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="${blog.title} | XR System" />
+          <meta name="twitter:description" content="${blog.excerpt}" />
+          <meta name="twitter:image" content="${blog.coverImage}" />
+        `;
+
+        htmlData = htmlData.replace(/<title>.*?<\/title>/, "");
+        htmlData = htmlData.replace('</head>', `${metaTags}</head>`);
+        
+        return res.send(htmlData);
+      } catch (error) {
+        console.error("SEO Injection Error:", error);
+        return res.sendFile(path.join(distPath, "index.html"));
+      }
+    });
+
     if (fs.existsSync(distPath)) {
       app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
     }
