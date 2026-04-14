@@ -1,119 +1,127 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from './context/AuthContext';
+import { AdminProvider } from './context/AdminContext';
+import { Analytics } from '@vercel/analytics/react';
 import axios from 'axios';
 
-export default function AdminBlogEditor() {
-  const navigate = useNavigate();
-  const [blog, setBlog] = useState({ title: '', excerpt: '', content: '', category: 'Tech', coverImage: '' });
-  const [saving, setSaving] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+import Home from './pages/Home';
+import About from './pages/About';
+import Services from './pages/Services';
+import Portfolio from './pages/Portfolio';
+import Contact from './pages/Contact';
+import Pricing from './pages/Pricing';
+import Careers from './pages/Careers';
+import NotFound from './pages/NotFound';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
+import AdminBlogManager from './pages/AdminBlogManager';
+import AdminBlogEditor from './pages/AdminBlogEditor';
+import { PrivacyPolicy, TermsOfService } from './pages/Legal';
+import PaymentSuccess from './pages/PaymentSuccess';
 
-    setUploadingImage(true);
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    try {
-      const res = await axios.post('/api/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
-        }
-      });
-      
-      if(res.data.success) {
-        setBlog({ ...blog, coverImage: res.data.secure_url });
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Image upload fail ho gaya.");
-    } finally {
-      setUploadingImage(false);
-    }
-  };
+import ClientPortal from './pages/ClientPortal'; 
+import SecretAdminLogin from './pages/SecretAdminLogin'; 
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await axios.post('/api/blogs', blog, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
-      });
-      navigate('/admin/blogs');
-    } catch (err) { 
-      alert("Error saving blog"); 
-    } finally { 
-      setSaving(false); 
-    }
-  };
+import Invoice from './pages/Invoice'; 
+
+import AdminLayout from './components/AdminLayout'; 
+import DashboardHome from './pages/DashboardHome';
+import CrmLeads from './pages/CrmLeads'; 
+import ContentManager from './pages/ContentManager'; 
+import Billing from './pages/Billing';
+
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import WhatsAppButton from './components/WhatsAppButton';
+import ErrorBoundary from './components/ErrorBoundary';
+import ScrollToTop from './components/ScrollToTop';
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+  
+  if (!token || token === 'undefined' || token === 'null') {
+    return <Navigate to="/xradmin" replace />;
+  }
+  
+  return children;
+};
+
+function AppContent() {
+  const location = useLocation();
+  
+  const isAuth = ['/login', '/xradmin'].includes(location.pathname) || 
+                 location.pathname.startsWith('/admin') || 
+                 location.pathname.startsWith('/invoice');
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
-      <div className="flex justify-between items-center border-b pb-4">
-        <h2 className="text-xl font-bold">Drafting New Story</h2>
-        <div className="flex gap-3">
-          <button onClick={() => navigate('/admin/blogs')} className="px-4 py-2 text-slate-500 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
-          <button onClick={handleSave} disabled={saving} className="bg-brand-600 text-white px-6 py-2 rounded-xl flex items-center gap-2 font-bold hover:bg-brand-700 disabled:opacity-50">
-            <Save size={18} /> {saving ? "Publishing..." : "Publish Now"}
-          </button>
-        </div>
-      </div>
-
-      <div className="space-y-8 mt-8">
-        <input 
-          type="text" 
-          placeholder="Title of the story..." 
-          className="w-full text-5xl font-display font-bold border-none outline-none placeholder:text-slate-200"
-          value={blog.title}
-          onChange={e => setBlog({...blog, title: e.target.value})}
-        />
-
-        <div className="flex flex-wrap gap-4 items-center">
-          <input 
-            type="text" 
-            placeholder="Category (e.g. SEO, Web)" 
-            className="bg-slate-100 px-4 py-2 rounded-xl text-sm outline-none border-none w-48"
-            value={blog.category}
-            onChange={e => setBlog({...blog, category: e.target.value})}
-          />
+    <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
+      {!isAuth && <Navbar />}
+      <main className="grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           
-          <div className="relative flex items-center">
-            <input 
-              type="file" 
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              disabled={uploadingImage}
-            />
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 ${uploadingImage ? 'bg-slate-50 text-slate-400' : 'bg-white hover:bg-slate-50 text-slate-700'} transition-colors`}>
-              {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <ImageIcon size={16} />}
-              {uploadingImage ? "Uploading..." : blog.coverImage ? "Change Cover Image" : "Upload Cover Image"}
-            </div>
-          </div>
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           
-          {blog.coverImage && (
-             <img src={blog.coverImage} alt="Cover Preview" className="h-10 w-10 object-cover rounded-lg border border-slate-200 shadow-sm" />
-          )}
-        </div>
+          <Route path="/invoice/:id" element={<Invoice />} />
+          
+          <Route path="/login" element={<ClientPortal />} />
 
-        <textarea 
-          placeholder="Write a short teaser (Excerpt)..." 
-          className="w-full text-xl text-slate-500 border-none outline-none resize-none h-20"
-          value={blog.excerpt}
-          onChange={e => setBlog({...blog, excerpt: e.target.value})}
-        />
+          <Route path="/xradmin" element={<SecretAdminLogin />} />
 
-        <textarea 
-          placeholder="Tell your story... (You can use HTML tags here)" 
-          className="w-full text-lg leading-relaxed border-none outline-none min-h-100"
-          value={blog.content}
-          onChange={e => setBlog({...blog, content: e.target.value})}
-        />
-      </div>
+          <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminProvider>
+                <AdminLayout />
+              </AdminProvider>
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="crm" element={<CrmLeads />} /> 
+            <Route path="cms" element={<ContentManager />} />
+            <Route path="billing" element={<Billing />} />
+            <Route path="blogs" element={<AdminBlogManager />} />
+            <Route path="blogs/new" element={<AdminBlogEditor />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      
+      {!isAuth && <WhatsAppButton />} 
+      
+      {!isAuth && <Footer />}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <HelmetProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <AppContent />
+            <Analytics />
+          </AuthProvider>
+        </ErrorBoundary>
+      </HelmetProvider>
+    </BrowserRouter>
   );
 }

@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/', protectAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Bhai, image select nahi ki!' });
+      return res.status(400).json({ success: false, message: 'Image file select nahi ki gai hai.' });
     }
 
     const secure_url = await uploadToCloudinary(req.file.path);
