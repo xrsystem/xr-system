@@ -30,7 +30,7 @@ export default function Blog() {
   const categories = [
     { name: 'All', icon: <BookOpen size={16} /> },
     { name: 'Growth', icon: <TrendingUp size={16} /> },
-    { name: 'Engineering', icon: <Code2 size={16} /> },
+    { name: 'Tech', icon: <Code2 size={16} /> },
     { name: 'Case Studies', icon: <Sparkles size={16} /> },
   ];
 
