@@ -2,24 +2,20 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
-
-const modules = {
-  toolbar: [
-    [{ 'header': [2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}],
-    ['link'],
-    ['clean']
-  ],
-};
+import JoditEditor from 'jodit-react';
 
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
   const [blog, setBlog] = useState({ title: '', excerpt: '', content: '', category: 'Tech', coverImage: '' });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  const editorConfig = {
+    readonly: false,
+    placeholder: 'Tell your story...',
+    height: 400,
+    buttons: ['bold', 'italic', 'underline', 'strikethrough', '|', 'ul', 'ol', '|', 'font', 'fontsize', 'brush', 'paragraph', '|', 'link', 'align', 'undo', 'redo', 'hr']
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -119,14 +115,12 @@ export default function AdminBlogEditor() {
           onChange={e => setBlog({...blog, excerpt: e.target.value})}
         />
 
-        <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-          <ReactQuill 
-            theme="snow"
+        <div className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-12">
+          <JoditEditor
             value={blog.content}
-            onChange={(content) => setBlog({...blog, content})}
-            modules={modules}
-            className="h-100 mb-12"
-            placeholder="Tell your story..."
+            config={editorConfig}
+            onBlur={newContent => setBlog({...blog, content: newContent})}
+            onChange={() => {}}
           />
         </div>
       </div>
