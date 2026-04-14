@@ -17,7 +17,35 @@ export const getAllBlogs = asyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { blogs }, "Blogs fetched"));
 });
 
+export const updateBlog = asyncHandler(async (req, res) => {
+  const { title, excerpt, content, category, coverImage } = req.body;
+  
+  let updateData = { title, excerpt, content, category, coverImage };
+  if (title) {
+    updateData.slug = title.toLowerCase().split(' ').join('-').replace(/[^\w-]+/g, '');
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    req.params.id, 
+    updateData, 
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedBlog) {
+    res.status(StatusCodes.NOT_FOUND);
+    throw new Error("Blog not found");
+  }
+
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, updatedBlog, "Blog updated successfully"));
+});
+
 export const deleteBlog = asyncHandler(async (req, res) => {
-  await Blog.findByIdAndDelete(req.params.id);
+  const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+  
+  if (!deletedBlog) {
+    res.status(StatusCodes.NOT_FOUND);
+    throw new Error("Blog not found");
+  }
+
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, null, "Blog deleted"));
 });
