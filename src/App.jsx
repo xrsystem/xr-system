@@ -7,6 +7,13 @@ import axios from 'axios';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
+axios.interceptors.request.use((config) => {
+  if (config.method === 'get') {
+    config.url = config.url + (config.url.includes('?') ? '&' : '?') + '_t=' + new Date().getTime();
+  }
+  return config;
+});
+
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
