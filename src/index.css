@@ -5,9 +5,6 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
   
-  --font-serif-heading: "Playfair Display", serif;
-  --font-serif-body: "Lora", serif;
-  
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
   --color-brand-200: #c7d2fe;
@@ -35,4 +32,19 @@
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.premium-blog h1, .premium-blog h2, .premium-blog h3, .premium-blog h4 {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: bold;
+  letter-spacing: -0.02em;
+}
+.premium-blog p, .premium-blog li, .premium-blog blockquote, .premium-blog span {
+  font-family: 'Lora', serif !important;
+  color: #334155 !important;
+  line-height: 1.8 !important;
+}
+.premium-blog blockquote {
+  font-style: italic;
+  border-left-color: #4f46e5 !important;
 }

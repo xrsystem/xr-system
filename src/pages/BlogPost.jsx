@@ -50,11 +50,7 @@ export default function BlogPost() {
       )}
 
       <div 
-        className="prose prose-lg max-w-none 
-                   prose-headings:font-serif-heading prose-headings:font-bold prose-headings:tracking-tight 
-                   prose-p:font-serif-body prose-p:leading-relaxed prose-p:text-slate-700
-                   prose-a:text-brand-600 prose-blockquote:border-l-brand-600 prose-blockquote:font-serif-body prose-blockquote:italic
-                   prose-li:font-serif-body mt-12"
+        className="prose prose-lg max-w-none premium-blog mt-12 prose-a:text-brand-600"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
     </article>
