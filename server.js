@@ -1,7 +1,6 @@
 import 'dotenv/config'; 
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
@@ -26,10 +25,6 @@ import siteSettingsRoutes from './server/routes/siteSettings.routes.js';
 import blogRoutes from './server/routes/blog.routes.js'; 
 import uploadRoutes from './server/routes/upload.routes.js';
 
-import Blog from './server/models/Blog.js';
-
-console.log("==== ENV PORT CHECK ====", process.env.PORT);
-
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
@@ -46,18 +41,35 @@ async function startServer() {
   }));
   
   app.use(cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        process.env.CLIENT_URL, 
+        'http://localhost:5173', 
+        'http://localhost:3000'
+      ];
+      if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'))) {
+        callback(null, true);
+      } else {
+        callback(new Error('Blocked by CORS policy'));
+      }
+    },
     credentials: true
   }));
   
   app.use(cookieParser());
   app.use(express.json());
+
+  app.use("/api", (req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+  });
   
   const uploadsDir = path.join(process.cwd(), "uploads");
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
-  
   app.use("/uploads", express.static(uploadsDir));
 
   app.use(morgan("combined", { 
@@ -71,10 +83,6 @@ async function startServer() {
     message: "Too many requests from this IP, please try again after 15 minutes",
     standardHeaders: true,
     legacyHeaders: false,
-    validate: { 
-      xForwardedForHeader: false,
-      forwardedHeader: false
-    },
   });
   app.use("/api/", apiLimiter);
 
@@ -94,59 +102,6 @@ async function startServer() {
     res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { status: "UP" }, "Server is healthy"));
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log("Starting Vite Middleware (Development Mode)");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-    }
-
-    app.get("/blog/:slug", async (req, res) => {
-      try {
-        const { slug } = req.params;
-        const blog = await Blog.findOne({ slug });
-
-        if (!blog) {
-          return res.sendFile(path.join(distPath, "index.html"));
-        }
-
-        let htmlData = fs.readFileSync(path.join(distPath, "index.html"), 'utf8');
-
-        const metaTags = `
-          <title>${blog.title} | XR System</title>
-          <meta name="description" content="${blog.excerpt}" />
-          <meta property="og:title" content="${blog.title} | XR System" />
-          <meta property="og:description" content="${blog.excerpt}" />
-          <meta property="og:image" content="${blog.coverImage}" />
-          <meta property="og:url" content="https://xrsystem.in/blog/${blog.slug}" />
-          <meta property="og:type" content="article" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content="${blog.title} | XR System" />
-          <meta name="twitter:description" content="${blog.excerpt}" />
-          <meta name="twitter:image" content="${blog.coverImage}" />
-        `;
-
-        htmlData = htmlData.replace(/<title>.*?<\/title>/, "");
-        htmlData = htmlData.replace('</head>', `${metaTags}</head>`);
-        
-        return res.send(htmlData);
-      } catch (error) {
-        console.error("SEO Injection Error:", error);
-        return res.sendFile(path.join(distPath, "index.html"));
-      }
-    });
-
-    if (fs.existsSync(distPath)) {
-      app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
-    }
-  }
 
   app.use(errorMiddleware);
 
