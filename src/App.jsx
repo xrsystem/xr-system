@@ -98,6 +98,7 @@ function AppContent() {
             <Route path="billing" element={<Billing />} />
             <Route path="blogs" element={<AdminBlogManager />} />
             <Route path="blogs/new" element={<AdminBlogEditor />} />
+            <Route path="blogs/edit/:id" element={<AdminBlogEditor />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

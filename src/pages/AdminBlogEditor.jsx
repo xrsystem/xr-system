@@ -1,14 +1,33 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import JoditEditor from 'jodit-react';
 
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
   const [blog, setBlog] = useState({ title: '', excerpt: '', content: '', category: 'Tech', coverImage: '' });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [loadingData, setLoadingData] = useState(isEditMode);
+
+  useEffect(() => {
+    if (isEditMode) {
+      axios.get('/api/blogs')
+        .then(res => {
+          const allBlogs = res.data?.data?.blogs || [];
+          const foundBlog = allBlogs.find(b => b._id === id);
+          if (foundBlog) {
+            setBlog(foundBlog);
+          }
+        })
+        .catch(err => console.error("Error fetching blog for edit:", err))
+        .finally(() => setLoadingData(false));
+    }
+  }, [id, isEditMode]);
 
   const config = useMemo(() => ({
     readonly: false,
@@ -65,25 +84,32 @@ export default function AdminBlogEditor() {
     }
     setSaving(true);
     try {
-      await axios.post('/api/blogs', blog, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
-      });
+      const headers = { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` };
+      
+      if (isEditMode) {
+        await axios.put(`/api/blogs/${id}`, blog, { headers });
+      } else {
+        await axios.post('/api/blogs', blog, { headers });
+      }
+      
       navigate('/admin/blogs');
     } catch (err) { 
-      alert("Error saving blog"); 
+      alert("Error saving blog! Backend routing check karein."); 
     } finally { 
       setSaving(false); 
     }
   };
 
+  if (loadingData) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-brand-600 w-10 h-10" /></div>;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       <div className="flex justify-between items-center border-b pb-4">
-        <h2 className="text-xl font-bold">Drafting New Story</h2>
+        <h2 className="text-xl font-bold">{isEditMode ? "Editing Story" : "Drafting New Story"}</h2>
         <div className="flex gap-3">
           <button onClick={() => navigate('/admin/blogs')} className="px-4 py-2 text-slate-500 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
           <button onClick={handleSave} disabled={saving} className="bg-brand-600 text-white px-6 py-2 rounded-xl flex items-center gap-2 font-bold hover:bg-brand-700 disabled:opacity-50">
-            <Save size={18} /> {saving ? "Publishing..." : "Publish Now"}
+            <Save size={18} /> {saving ? "Saving..." : (isEditMode ? "Update Now" : "Publish Now")}
           </button>
         </div>
       </div>
@@ -92,7 +118,7 @@ export default function AdminBlogEditor() {
         <input 
           type="text" 
           placeholder="Title of the story..." 
-          className="w-full text-5xl font-display font-bold border-none outline-none placeholder:text-slate-200"
+          className="w-full text-5xl font-display font-bold border-none outline-none placeholder:text-slate-200 bg-transparent"
           value={blog.title}
           onChange={e => setBlog({...blog, title: e.target.value})}
         />
@@ -127,7 +153,7 @@ export default function AdminBlogEditor() {
 
         <textarea 
           placeholder="Write a short teaser (Excerpt)..." 
-          className="w-full text-xl text-slate-500 border-none outline-none resize-none h-20"
+          className="w-full text-xl text-slate-500 border-none outline-none resize-none h-20 bg-transparent"
           value={blog.excerpt}
           onChange={e => setBlog({...blog, excerpt: e.target.value})}
         />
