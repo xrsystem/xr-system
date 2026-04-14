@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
@@ -10,12 +10,25 @@ export default function AdminBlogEditor() {
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const editorConfig = {
+  const config = useMemo(() => ({
     readonly: false,
     placeholder: 'Tell your story...',
     height: 400,
-    buttons: ['bold', 'italic', 'underline', 'strikethrough', '|', 'ul', 'ol', '|', 'font', 'fontsize', 'brush', 'paragraph', '|', 'link', 'align', 'undo', 'redo', 'hr']
-  };
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_as_html',
+    processPasteHTML: true,
+    pastePlainHTML: false, 
+    cleanHTML: false,
+    buttons: [
+      'bold', 'italic', 'underline', 'strikethrough', '|', 
+      'ul', 'ol', '|', 'font', 'fontsize', 'brush', 'paragraph', '|', 
+      'link', 'align', 'undo', 'redo', 'hr', 'eraser', 'fullsize'
+    ],
+    uploader: {
+      insertImageAsBase64URI: true
+    }
+  }), []);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -46,6 +59,10 @@ export default function AdminBlogEditor() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!blog.title || !blog.content) {
+      alert("Please add at least a title and content!");
+      return;
+    }
     setSaving(true);
     try {
       await axios.post('/api/blogs', blog, {
@@ -118,9 +135,8 @@ export default function AdminBlogEditor() {
         <div className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-12">
           <JoditEditor
             value={blog.content}
-            config={editorConfig}
+            config={config}
             onBlur={newContent => setBlog({...blog, content: newContent})}
-            onChange={() => {}}
           />
         </div>
       </div>
