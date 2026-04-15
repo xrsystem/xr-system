@@ -14,6 +14,16 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    alert("Mobile Error: " + error.message + " | URL: " + (error.config?.url || "Unknown"));
+    return Promise.reject(error);
+  }
+);
+
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';

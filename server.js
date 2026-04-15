@@ -42,14 +42,20 @@ async function startServer() {
   
   app.use(cors({
     origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
       const allowedOrigins = [
         process.env.CLIENT_URL, 
+        'https://xrsystem.in',
+        'https://www.xrsystem.in',
         'http://localhost:5173', 
         'http://localhost:3000'
       ];
-      if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'))) {
+
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
         callback(null, true);
       } else {
+        console.log("🚫 CORS Blocked This Origin:", origin);
         callback(new Error('Blocked by CORS policy'));
       }
     },
@@ -101,7 +107,6 @@ async function startServer() {
   app.get("/api/health", (req, res) => {
     res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { status: "UP" }, "Server is healthy"));
   });
-
 
   app.use(errorMiddleware);
 
