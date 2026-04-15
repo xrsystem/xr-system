@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import { Analytics } from '@vercel/analytics/react';
 import axios from 'axios';
+import { lazy, Suspense } from 'react';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
@@ -24,37 +25,37 @@ axios.interceptors.response.use(
   }
 );
 
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import Portfolio from './pages/Portfolio';
-import Contact from './pages/Contact';
-import Pricing from './pages/Pricing';
-import Careers from './pages/Careers';
-import NotFound from './pages/NotFound';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import AdminBlogManager from './pages/AdminBlogManager';
-import AdminBlogEditor from './pages/AdminBlogEditor';
-import { PrivacyPolicy, TermsOfService } from './pages/Legal';
-import PaymentSuccess from './pages/PaymentSuccess';
-
-import ClientPortal from './pages/ClientPortal'; 
-import SecretAdminLogin from './pages/SecretAdminLogin'; 
-
-import Invoice from './pages/Invoice'; 
-
-import AdminLayout from './components/AdminLayout'; 
-import DashboardHome from './pages/DashboardHome';
-import CrmLeads from './pages/CrmLeads'; 
-import ContentManager from './pages/ContentManager'; 
-import Billing from './pages/Billing';
-
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
+import AdminLayout from './components/AdminLayout'; 
+
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Services = lazy(() => import('./pages/Services'));
+const Portfolio = lazy(() => import('./pages/Portfolio'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const Careers = lazy(() => import('./pages/Careers'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const AdminBlogManager = lazy(() => import('./pages/AdminBlogManager'));
+const AdminBlogEditor = lazy(() => import('./pages/AdminBlogEditor'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const ClientPortal = lazy(() => import('./pages/ClientPortal')); 
+const SecretAdminLogin = lazy(() => import('./pages/SecretAdminLogin')); 
+const Invoice = lazy(() => import('./pages/Invoice')); 
+const DashboardHome = lazy(() => import('./pages/DashboardHome'));
+const CrmLeads = lazy(() => import('./pages/CrmLeads')); 
+const ContentManager = lazy(() => import('./pages/ContentManager')); 
+const Billing = lazy(() => import('./pages/Billing'));
+
+const PrivacyPolicy = lazy(() => import('./pages/Legal').then(module => ({ default: module.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('./pages/Legal').then(module => ({ default: module.TermsOfService })));
+
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
@@ -78,48 +79,50 @@ function AppContent() {
       <ScrollToTop />
       {!isAuth && <Navbar />}
       <main className="grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          
-          <Route path="/invoice/:id" element={<Invoice />} />
-          
-          <Route path="/login" element={<ClientPortal />} />
+        <Suspense fallback={<div className="h-[60vh] flex items-center justify-center text-slate-500">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            
+            <Route path="/invoice/:id" element={<Invoice />} />
+            
+            <Route path="/login" element={<ClientPortal />} />
 
-          <Route path="/xradmin" element={<SecretAdminLogin />} />
+            <Route path="/xradmin" element={<SecretAdminLogin />} />
 
-          <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
 
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminProvider>
-                <AdminLayout />
-              </AdminProvider>
-            </ProtectedRoute>
-          }>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<DashboardHome />} />
-            <Route path="crm" element={<CrmLeads />} /> 
-            <Route path="cms" element={<ContentManager />} />
-            <Route path="billing" element={<Billing />} />
-            <Route path="blogs" element={<AdminBlogManager />} />
-            <Route path="blogs/new" element={<AdminBlogEditor />} />
-            <Route path="blogs/edit/:id" element={<AdminBlogEditor />} />
-          </Route>
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminProvider>
+                  <AdminLayout />
+                </AdminProvider>
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardHome />} />
+              <Route path="crm" element={<CrmLeads />} /> 
+              <Route path="cms" element={<ContentManager />} />
+              <Route path="billing" element={<Billing />} />
+              <Route path="blogs" element={<AdminBlogManager />} />
+              <Route path="blogs/new" element={<AdminBlogEditor />} />
+              <Route path="blogs/edit/:id" element={<AdminBlogEditor />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
       
       {!isAuth && <WhatsAppButton />} 
