@@ -14,6 +14,10 @@ export default function ServiceManager() {
   });
   const [imageFile, setImageFile] = useState(null);
 
+  const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+  const getAuthConfig = () => ({ headers: { Authorization: `Bearer ${token}` } });
+  const getFormAuthConfig = () => ({ headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } });
+
   const fetchServices = async () => {
     try {
       const response = await axios.get('/api/services');
@@ -29,11 +33,8 @@ export default function ServiceManager() {
 
   const handleEditClick = (service) => {
     setNewService({
-      title: service.title,
-      description: service.description,
-      iconName: service.iconName || 'Globe',
-      features: service.features ? service.features.join(', ') : '',
-      benefits: service.benefits ? service.benefits.join(', ') : ''
+      title: service.title, description: service.description, iconName: service.iconName || 'Globe',
+      features: service.features ? service.features.join(', ') : '', benefits: service.benefits ? service.benefits.join(', ') : ''
     });
     setEditingId(service._id);
     setImageFile(null); 
@@ -55,18 +56,15 @@ export default function ServiceManager() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/services/${editingId}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }});
+        await axios.put(`/api/services/${editingId}`, formData, getFormAuthConfig());
       } else {
-        await axios.post('/api/services', formData, { headers: { 'Content-Type': 'multipart/form-data' }});
+        await axios.post('/api/services', formData, getFormAuthConfig());
       }
-      
-      setShowForm(false);
-      setEditingId(null);
+      setShowForm(false); setEditingId(null);
       setNewService({ title: '', description: '', iconName: 'Globe', features: '', benefits: '' });
-      setImageFile(null);
-      fetchServices(); 
+      setImageFile(null); fetchServices(); 
     } catch (error) {
-      alert("Failed to save service");
+      alert("Failed to save service"); console.error(error);
     } finally {
       setSubmitting(false);
     }
@@ -74,26 +72,29 @@ export default function ServiceManager() {
 
   const toggleStatus = async (id, currentStatus) => {
     setServices(services.map(s => s._id === id ? { ...s, isActive: !currentStatus } : s));
-    try { await axios.patch(`/api/services/${id}/status`); } 
-    catch (error) { setServices(services.map(s => s._id === id ? { ...s, isActive: currentStatus } : s)); }
+    try { await axios.patch(`/api/services/${id}/status`, {}, getAuthConfig()); } 
+    catch (error) { 
+      setServices(services.map(s => s._id === id ? { ...s, isActive: currentStatus } : s)); 
+      alert("Failed to update visibility.");
+    }
   };
 
   const deleteService = async (id) => {
     if(!window.confirm("Delete this service completely?")) return;
     try {
-      await axios.delete(`/api/services/${id}`);
+      await axios.delete(`/api/services/${id}`, getAuthConfig());
       setServices(services.filter(s => s._id !== id));
     } catch (error) { alert("Failed to delete service"); }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Services Manager</h2>
           <p className="text-slate-500 text-sm mt-1">Manage core services offered on your website.</p>
         </div>
-        <button onClick={() => { setShowForm(true); setEditingId(null); setNewService({ title: '', description: '', iconName: 'Globe', features: '', benefits: '' }); }} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors">
+        <button onClick={() => { setShowForm(true); setEditingId(null); setNewService({ title: '', description: '', iconName: 'Globe', features: '', benefits: '' }); }} className="flex items-center justify-center w-full sm:w-auto gap-2 bg-brand-600 text-white px-4 py-2.5 rounded-xl hover:bg-brand-700 transition-colors font-bold">
           <Plus size={18} /> Add New Service
         </button>
       </div>
@@ -135,30 +136,30 @@ export default function ServiceManager() {
           </div>
 
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
-            <button type="submit" disabled={submitting} className="px-4 py-2 bg-brand-600 text-white rounded-lg disabled:opacity-50">
+            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-bold">Cancel</button>
+            <button type="submit" disabled={submitting} className="px-6 py-2 bg-brand-600 text-white font-bold rounded-lg disabled:opacity-50 hover:bg-brand-700">
               {submitting ? 'Saving...' : (editingId ? 'Update Service' : 'Publish Service')}
             </button>
           </div>
         </form>
       )}
 
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden w-full">
         {loading ? ( <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-brand-600" /></div> ) 
         : services.length === 0 ? ( <div className="p-8 text-center text-slate-500">No services added yet.</div> ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
              {services.map(service => (
-               <div key={service._id} className="border border-slate-200 rounded-xl overflow-hidden group">
+               <div key={service._id} className="border border-slate-200 rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
                  <div className="h-40 bg-slate-100 relative">
                    <img src={service.imageUrl} alt={service.title} className="w-full h-full object-cover object-top" />
-                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                     <button onClick={() => toggleStatus(service._id, service.isActive)} className={`px-3 py-1.5 rounded-full text-xs font-bold text-white ${service.isActive ? 'bg-emerald-500' : 'bg-slate-500'}`}>
-                       {service.isActive ? 'Live' : 'Hidden'}
+                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                     <button onClick={() => toggleStatus(service._id, service.isActive)} className={`px-4 py-2 rounded-full text-xs font-bold text-white shadow-sm ${service.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-500 hover:bg-slate-600'}`}>
+                       {service.isActive ? 'Visible Live' : 'Hidden'}
                      </button>
-                     <button onClick={() => handleEditClick(service)} className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors title='Edit'">
+                     <button onClick={() => handleEditClick(service)} className="p-2.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-sm" title="Edit">
                        <Edit2 size={16} />
                      </button>
-                     <button onClick={() => deleteService(service._id)} className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors title='Delete'">
+                     <button onClick={() => deleteService(service._id)} className="p-2.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm" title="Delete">
                        <Trash2 size={16} />
                      </button>
                    </div>
