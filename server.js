@@ -30,9 +30,9 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   const app = express();
   
-  console.log("⏳ Connecting to MongoDB...");
+  logger.info("⏳ Connecting to MongoDB...");
   await connectDB();
-  console.log("✅ MongoDB Connected Successfully!");
+  logger.info("✅ MongoDB Connected Successfully!");
   
   app.set("trust proxy", 1);
   
@@ -40,26 +40,31 @@ async function startServer() {
     contentSecurityPolicy: false, 
   }));
   
+  const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'https://xrsystem.in',
+    'https://www.xrsystem.in',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ];
+
   app.use(cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = [
-        process.env.CLIENT_URL, 
-        'https://xrsystem.in',
-        'https://www.xrsystem.in',
-        'http://localhost:5173', 
-        'http://localhost:3000'
-      ];
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        origin.endsWith('.vercel.app');
 
-      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      if (isAllowed) {
         callback(null, true);
       } else {
-        console.log("🚫 CORS Blocked This Origin:", origin);
-        callback(new Error('Blocked by CORS policy'));
+        logger.warn(`🚫 CORS Blocked Request from: ${origin}`);
+        callback(new Error('Origin not allowed by CORS'));
       }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   }));
   
   app.use(cookieParser());
@@ -111,13 +116,11 @@ async function startServer() {
   app.use(errorMiddleware);
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 XR Backend officially running on port ${PORT}`);
-    logger.info(`XR running on port ${PORT}`);
+    logger.info(`🚀 XR Backend officially running on api.xrsystem.in (Port ${PORT})`);
   });
 }
 
 startServer().catch((err) => {
-  console.error("❌ CRITICAL SERVER ERROR:", err);
-  logger.error("Failed to start server:", err);
+  logger.error("❌ CRITICAL SERVER ERROR:", err);
   process.exit(1);
 });
