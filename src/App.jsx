@@ -56,7 +56,6 @@ const Billing = lazy(() => import('./pages/Billing'));
 const PrivacyPolicy = lazy(() => import('./pages/Legal').then(module => ({ default: module.PrivacyPolicy })));
 const TermsOfService = lazy(() => import('./pages/Legal').then(module => ({ default: module.TermsOfService })));
 
-
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
   
@@ -79,7 +78,7 @@ function AppContent() {
       <ScrollToTop />
       {!isAuth && <Navbar />}
       <main className="grow">
-        <Suspense fallback={<div className="h-[60vh] flex items-center justify-center text-slate-500">Loading...</div>}>
+        <Suspense fallback={<div className="h-[60vh] flex items-center justify-center text-brand-600 font-bold">Loading...</div>}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />

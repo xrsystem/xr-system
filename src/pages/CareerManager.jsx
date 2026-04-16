@@ -19,7 +19,7 @@ export default function CareerManager() {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get('/api/careers/jobs');
+      const response = await axios.get('/api/careers/jobs?all=true', getAuthConfig());
       if (response.data?.data?.jobs) setJobs(response.data.data.jobs);
     } catch (error) {
       console.error("Failed to fetch jobs", error);
@@ -66,7 +66,7 @@ export default function CareerManager() {
       await axios.patch(`/api/careers/jobs/${id}/status`, {}, getAuthConfig());
     } catch (error) {
       setJobs(jobs.map(job => job._id === id ? { ...job, isActive: currentStatus } : job));
-      alert("Failed to update status. Check permissions.");
+      alert("Failed to update status.");
     }
   };
 
@@ -99,10 +99,10 @@ export default function CareerManager() {
           <h3 className="text-lg font-bold text-slate-800 mb-4">{editingId ? 'Edit Job Posting' : 'Create New Job'}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Job Title (e.g. Frontend Developer (React))" required value={newJob.title} onChange={(e) => setNewJob({...newJob, title: e.target.value})} className="border p-2 rounded-lg w-full" />
-            <input type="text" placeholder="Department (e.g. ENGINEERING)" required value={newJob.department} onChange={(e) => setNewJob({...newJob, department: e.target.value.toUpperCase()})} className="border p-2 rounded-lg w-full" />
-            <input type="text" placeholder="Location (e.g. RANCHI / REMOTE)" required value={newJob.location} onChange={(e) => setNewJob({...newJob, location: e.target.value.toUpperCase()})} className="border p-2 rounded-lg w-full" />
-            <input type="text" placeholder="Experience (e.g. 1-3 YRS or Fresher)" required value={newJob.experience} onChange={(e) => setNewJob({...newJob, experience: e.target.value})} className="border p-2 rounded-lg w-full" />
+            <input type="text" placeholder="Job Title" required value={newJob.title} onChange={(e) => setNewJob({...newJob, title: e.target.value})} className="border p-2 rounded-lg w-full" />
+            <input type="text" placeholder="Department" required value={newJob.department} onChange={(e) => setNewJob({...newJob, department: e.target.value.toUpperCase()})} className="border p-2 rounded-lg w-full" />
+            <input type="text" placeholder="Location" required value={newJob.location} onChange={(e) => setNewJob({...newJob, location: e.target.value.toUpperCase()})} className="border p-2 rounded-lg w-full" />
+            <input type="text" placeholder="Experience" required value={newJob.experience} onChange={(e) => setNewJob({...newJob, experience: e.target.value})} className="border p-2 rounded-lg w-full" />
             
             <select value={newJob.type} onChange={(e) => setNewJob({...newJob, type: e.target.value})} className="border p-2 rounded-lg w-full">
               <option value="FULL-TIME">FULL-TIME</option>
@@ -111,7 +111,7 @@ export default function CareerManager() {
               <option value="INTERNSHIP">INTERNSHIP</option>
             </select>
           </div>
-          <textarea placeholder="Job Description (Looking for a hungry React developer...)" required rows="8" value={newJob.description} onChange={(e) => setNewJob({...newJob, description: e.target.value})} className="border p-2 rounded-lg w-full"></textarea>
+          <textarea placeholder="Job Description..." required rows="8" value={newJob.description} onChange={(e) => setNewJob({...newJob, description: e.target.value})} className="border p-2 rounded-lg w-full"></textarea>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-bold">Cancel</button>
             <button type="submit" disabled={submitting} className="px-6 py-2 bg-brand-600 text-white font-bold rounded-lg disabled:opacity-50 hover:bg-brand-700">
@@ -128,7 +128,7 @@ export default function CareerManager() {
           ) : jobs.length === 0 ? (
             <div className="p-8 text-center text-slate-500">No jobs posted yet.</div>
           ) : (
-            <table className="w-full text-left text-sm whitespace-nowrap min-w-175">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-225">
               <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
                 <tr>
                   <th className="px-6 py-4 font-bold">Job Info</th>

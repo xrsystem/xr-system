@@ -51,7 +51,7 @@ export default function AdminBlogManager() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm w-full">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse min-w-200">
             <thead>

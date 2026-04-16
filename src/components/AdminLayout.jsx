@@ -89,7 +89,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden w-full max-w-[100vw]">
         <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
           
           <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 bg-slate-50/50 w-full">
           <Outlet /> 
         </div>
       </main>

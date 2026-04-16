@@ -37,7 +37,6 @@ export default function CrmLeads() {
       }
     };
     fetchLeads();
-    
   }, []);
 
   const filteredLeads = leads.filter(lead => {
@@ -117,15 +116,15 @@ export default function CrmLeads() {
         </div>
       </div>
 
-      <div className="flex bg-slate-200/50 p-1 rounded-2xl w-fit">
-        <button onClick={() => setActiveTab('inbox')} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'inbox' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Inbox size={16} /> Inbox</button>
-        <button onClick={() => setActiveTab('active')} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'active' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Briefcase size={16} /> Active Projects</button>
-        <button onClick={() => setActiveTab('subs')} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'subs' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><RefreshCcw size={16} /> Subscriptions</button>
+      <div className="flex flex-wrap bg-slate-200/50 p-1 rounded-2xl w-full sm:w-fit gap-1">
+        <button onClick={() => setActiveTab('inbox')} className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex-1 sm:flex-none justify-center ${activeTab === 'inbox' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Inbox size={16} /> Inbox</button>
+        <button onClick={() => setActiveTab('active')} className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex-1 sm:flex-none justify-center ${activeTab === 'active' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Briefcase size={16} /> Active</button>
+        <button onClick={() => setActiveTab('subs')} className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex-1 sm:flex-none justify-center ${activeTab === 'subs' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><RefreshCcw size={16} /> Subs</button>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-sm whitespace-nowrap min-w-250">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
               <tr>
                 <th className="px-6 py-4">Client Details</th>
@@ -193,13 +192,11 @@ export default function CrmLeads() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          
                           {lead.isUnread && (
                             <button onClick={() => markAsRead(lead._id)} title="Mark as Read" className="p-2 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors inline-flex">
                               <CheckCircle2 className="h-5 w-5" />
                             </button>
                           )}
-
                           {lead.notionPageId && (
                              <a href={`https://www.notion.so/${lead.notionPageId.replace(/-/g, '')}`} target="_blank" rel="noopener noreferrer" title="View in Notion" className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors inline-flex"><ExternalLink className="h-5 w-5" /></a>
                           )}
