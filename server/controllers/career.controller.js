@@ -13,7 +13,8 @@ export const createJob = async (req, res) => {
 
 export const getJobs = async (req, res) => {
   try {
-    const query = (req.query.all === 'true' || req.admin) ? {} : { isActive: true };
+    const query = (req.query.all === 'true') ? {} : { isActive: true };
+    
     const jobs = await Job.find(query).sort({ createdAt: -1 });
     res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { jobs }, "Jobs fetched"));
   } catch (error) {
