@@ -33,17 +33,25 @@ export const createLead = asyncHandler(async (req, res) => {
     advancePaid: advancePaid ? Number(advancePaid) : 0 
   });
 
-  await onboardingService.sendClientConfirmation(lead);
-  await onboardingService.sendAdminNotification(lead);
+  try {
+    await onboardingService.sendClientConfirmation(lead);
+    await onboardingService.sendAdminNotification(lead);
+  } catch (emailError) {
+    console.error("⚠️ Email Sending Failed (Ignored):", emailError.message);
+  }
   
-  const notionPageId = await addLeadToNotion(lead, amount, promoDetails);
-  if (notionPageId) {
-    lead.notionPageId = notionPageId;
-    await lead.save();
+  try {
+    const notionPageId = await addLeadToNotion(lead, amount, promoDetails);
+    if (notionPageId) {
+      lead.notionPageId = notionPageId;
+      await lead.save();
+    }
+  } catch (notionError) {
+    console.error("⚠️ Notion Integration Failed (Ignored):", notionError.message);
   }
 
   let paymentLink = null;
-  res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead created successfully"));
+  res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead/Invoice created successfully"));
 });
 
 export const getLeadById = asyncHandler(async (req, res) => {
@@ -69,7 +77,10 @@ export const togglePortalAccess = asyncHandler(async (req, res) => {
   lead.portalAccess = portalAccess;
   await lead.save();
 
-  if (lead.notionPageId) { await updateNotionPortalAccess(lead.notionPageId, portalAccess); }
+  if (lead.notionPageId) { 
+    try { await updateNotionPortalAccess(lead.notionPageId, portalAccess); } 
+    catch(e) { console.error("Notion Sync Error:", e.message); }
+  }
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, `Portal access updated`));
 });
 
@@ -82,7 +93,10 @@ export const updateLeadStatus = asyncHandler(async (req, res) => {
   lead.status = status;
   await lead.save();
 
-  if (lead.notionPageId) { await updateNotionLeadStatus(lead.notionPageId, status); }
+  if (lead.notionPageId) { 
+    try { await updateNotionLeadStatus(lead.notionPageId, status); }
+    catch(e) { console.error("Notion Sync Error:", e.message); }
+  }
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, `Status updated to ${status}`));
 });
 
@@ -109,19 +123,29 @@ export const processAndSendInvoice = asyncHandler(async (req, res) => {
 
   let paymentLink = null;
 
-  if (amountToPay > 0) {
-    paymentLink = await createInvoicePaymentLink(lead, amountToPay, invoiceType);
-    if (paymentLink) {
-      lead.razorpayPaymentId = paymentLink;
-      await lead.save();
+  try {
+    if (amountToPay > 0) {
+      paymentLink = await createInvoicePaymentLink(lead, amountToPay, invoiceType);
+      if (paymentLink) {
+        lead.razorpayPaymentId = paymentLink;
+        await lead.save();
+      }
     }
+  } catch (payError) {
+    console.error("Payment Link Error:", payError.message);
   }
 
   const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${lead._id}`;
-  const emailSent = await sendInvoiceEmail(lead, invoiceType, paymentLink, dynamicInvoiceUrl, amountToPay, totalValue);
+  
+  let emailSent = false;
+  try {
+    emailSent = await sendInvoiceEmail(lead, invoiceType, paymentLink, dynamicInvoiceUrl, amountToPay, totalValue);
+  } catch (emailError) {
+    console.error("Invoice Email Error:", emailError.message);
+  }
 
   res.status(StatusCodes.OK).json(
-    new ApiResponse(StatusCodes.OK, { emailSent, paymentLink }, "Invoice & Payment link sent successfully!")
+    new ApiResponse(StatusCodes.OK, { emailSent, paymentLink }, "Invoice processed successfully!")
   );
 });
 
@@ -187,7 +211,7 @@ export const razorpayWebhook = asyncHandler(async (req, res) => {
         console.log(`🎉 Payment of ₹${amountPaid} received for ${lead.name}. Status auto-updated to ${lead.status}!`);
         
         if (lead.notionPageId) {
-          await updateNotionLeadStatus(lead.notionPageId, lead.status);
+          try { await updateNotionLeadStatus(lead.notionPageId, lead.status); } catch(e) {}
         }
       }
     }
@@ -223,14 +247,16 @@ cron.schedule('0 8 * * *', async () => {
         status: 'In Progress'
       });
 
-      const paymentLink = await createInvoicePaymentLink(newInvoice, newInvoice.price, "Subscription Receipt (Monthly Plan)");
-      if (paymentLink) {
-        newInvoice.razorpayPaymentId = paymentLink;
-        await newInvoice.save();
-      }
+      try {
+        const paymentLink = await createInvoicePaymentLink(newInvoice, newInvoice.price, "Subscription Receipt (Monthly Plan)");
+        if (paymentLink) {
+          newInvoice.razorpayPaymentId = paymentLink;
+          await newInvoice.save();
+        }
 
-      const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${newInvoice._id}`;
-      await sendInvoiceEmail(newInvoice, "Subscription Receipt (Monthly Plan)", paymentLink, dynamicInvoiceUrl, newInvoice.price, newInvoice.price);
+        const dynamicInvoiceUrl = `https://xrsystem.in/invoice/${newInvoice._id}`;
+        await sendInvoiceEmail(newInvoice, "Subscription Receipt (Monthly Plan)", paymentLink, dynamicInvoiceUrl, newInvoice.price, newInvoice.price);
+      } catch(e) { console.error("Auto-bill email/payment failed:", e.message); }
 
       sub.nextBillingDate = new Date(new Date().setMonth(today.getMonth() + 1));
       await sub.save();
