@@ -9,10 +9,17 @@ export const sendEmail = async (to, subject, htmlContent) => {
     }
 
     const emailData = {
-      sender: { name: "XR System", email: process.env.SMTP_USER }, 
+      sender: { 
+        name: process.env.SENDER_NAME || "XR System", 
+        email: process.env.SENDER_EMAIL || "support@xrsystem.in" 
+      }, 
       to: [{ email: to }],
       subject: subject,
       htmlContent: htmlContent,
+      replyTo: { 
+        name: process.env.SENDER_NAME || "XR System", 
+        email: process.env.SENDER_EMAIL || "support@xrsystem.in" 
+      }
     };
 
     await axios.post('https://api.brevo.com/v3/smtp/email', emailData, {
