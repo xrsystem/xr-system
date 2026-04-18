@@ -65,7 +65,7 @@ export default function Contact() {
 
             <div className="space-y-8">
               {[
-                { icon: <Mail size={24} />, title: 'Email Us', value: 'connect@xrsystem.in' },
+                { icon: <Mail size={24} />, title: 'Email Us', value: 'support@xrsystem.in' },
                 { icon: <Phone size={24} />, title: 'Call Us', value: '+91 9110047180' },
                 { icon: <MapPin size={24} />, title: 'Visit Us', value: 'Lower Burdwan Compound, Lalpur, Ranchi, 834001, Jharkhand.' },
               ].map((item, i) => (
