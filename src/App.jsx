@@ -16,11 +16,13 @@ axios.interceptors.request.use((config) => {
 });
 
 axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    alert("Mobile Error: " + error.message + " | URL: " + (error.config?.url || "Unknown"));
+    if (error.response && error.response.status >= 400 && error.response.status < 500) {
+      return Promise.reject(error);
+    }
+
+    console.error("API Fetch Error:", error.message, "| URL:", error.config?.url);
     return Promise.reject(error);
   }
 );
