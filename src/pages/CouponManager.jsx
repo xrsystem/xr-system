@@ -12,9 +12,13 @@ export default function CouponManager() {
     code: '', discountType: 'PERCENTAGE', discountValue: '', expiryDate: '' 
   });
 
+  const getAuthConfig = () => ({
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
+  });
+
   const fetchCoupons = async () => {
     try {
-      const response = await axios.get('/api/coupons');
+      const response = await axios.get('/api/coupons', getAuthConfig());
       if (response.data?.data?.coupons) setCoupons(response.data.data.coupons);
     } catch (error) { console.error("Failed to fetch coupons", error); } 
     finally { setLoading(false); }
@@ -34,7 +38,7 @@ export default function CouponManager() {
     if (!payload.expiryDate) delete payload.expiryDate;
 
     try {
-      await axios.post('/api/coupons', payload);
+      await axios.post('/api/coupons', payload, getAuthConfig());
       setShowForm(false);
       setNewCoupon({ code: '', discountType: 'PERCENTAGE', discountValue: '', expiryDate: '' });
       fetchCoupons(); 
@@ -45,13 +49,18 @@ export default function CouponManager() {
 
   const toggleStatus = async (id, currentStatus) => {
     setCoupons(coupons.map(c => c._id === id ? { ...c, isActive: !currentStatus } : c));
-    try { await axios.patch(`/api/coupons/${id}/status`); } 
+    try { 
+      await axios.patch(`/api/coupons/${id}/status`, {}, getAuthConfig()); 
+    } 
     catch (error) { setCoupons(coupons.map(c => c._id === id ? { ...c, isActive: currentStatus } : c)); }
   };
 
   const deleteCoupon = async (id) => {
     if(!window.confirm("Delete this coupon permanently?")) return;
-    try { await axios.delete(`/api/coupons/${id}`); setCoupons(coupons.filter(c => c._id !== id)); } 
+    try { 
+      await axios.delete(`/api/coupons/${id}`, getAuthConfig()); 
+      setCoupons(coupons.filter(c => c._id !== id)); 
+    } 
     catch (error) { alert("Failed to delete coupon"); }
   };
 
@@ -109,52 +118,54 @@ export default function CouponManager() {
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {loading ? ( <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-brand-600" /></div> ) 
         : coupons.length === 0 ? ( <div className="p-8 text-center text-slate-500">No promo codes active right now.</div> ) : (
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
-              <tr>
-                <th className="px-6 py-4">Promo Code</th>
-                <th className="px-6 py-4">Discount</th>
-                <th className="px-6 py-4">Expiry Date</th>
-                <th className="px-6 py-4 text-center">Status</th>
-                <th className="px-6 py-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {coupons.map(coupon => {
-                const isExpired = coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
-                return (
-                <tr key={coupon._id} className={!coupon.isActive || isExpired ? 'bg-slate-50/50 opacity-70' : ''}>
-                  <td className="px-6 py-4">
-                    <span className="bg-slate-100 text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg font-mono font-bold tracking-widest flex items-center gap-2 w-fit">
-                      <Tag size={14} className="text-brand-500" /> {coupon.code}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 font-bold text-emerald-600">
-                    {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue.toLocaleString()} OFF`}
-                  </td>
-                  <td className="px-6 py-4">
-                    {coupon.expiryDate ? (
-                      <span className={isExpired ? 'text-red-500 font-bold' : 'text-slate-600'}>
-                        {new Date(coupon.expiryDate).toLocaleDateString()} {isExpired && '(Expired)'}
-                      </span>
-                    ) : (
-                      <span className="text-slate-400 italic">No Expiry</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-center">
-                      <button onClick={() => toggleStatus(coupon._id, coupon.isActive)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${coupon.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}>
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${coupon.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => deleteCoupon(coupon._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
-                  </td>
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-sm min-w-175">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Promo Code</th>
+                  <th className="px-6 py-4">Discount</th>
+                  <th className="px-6 py-4">Expiry Date</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-right">Action</th>
                 </tr>
-              )})}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {coupons.map(coupon => {
+                  const isExpired = coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
+                  return (
+                  <tr key={coupon._id} className={!coupon.isActive || isExpired ? 'bg-slate-50/50 opacity-70' : ''}>
+                    <td className="px-6 py-4">
+                      <span className="bg-slate-100 text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg font-mono font-bold tracking-widest flex items-center gap-2 w-fit">
+                        <Tag size={14} className="text-brand-500" /> {coupon.code}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-emerald-600">
+                      {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue.toLocaleString()} OFF`}
+                    </td>
+                    <td className="px-6 py-4">
+                      {coupon.expiryDate ? (
+                        <span className={isExpired ? 'text-red-500 font-bold' : 'text-slate-600'}>
+                          {new Date(coupon.expiryDate).toLocaleDateString()} {isExpired && '(Expired)'}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 italic">No Expiry</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        <button onClick={() => toggleStatus(coupon._id, coupon.isActive)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${coupon.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${coupon.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button onClick={() => deleteCoupon(coupon._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                    </td>
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
