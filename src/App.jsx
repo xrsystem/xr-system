@@ -6,6 +6,8 @@ import { Analytics } from '@vercel/analytics/react';
 import axios from 'axios';
 import { lazy, Suspense } from 'react';
 
+import AnalyticsTracker from './components/AnalyticsTracker'; 
+
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 axios.interceptors.request.use((config) => {
@@ -21,7 +23,6 @@ axios.interceptors.response.use(
     if (error.response && error.response.status >= 400 && error.response.status < 500) {
       return Promise.reject(error);
     }
-
     console.error("API Fetch Error:", error.message, "| URL:", error.config?.url);
     return Promise.reject(error);
   }
@@ -60,17 +61,14 @@ const TermsOfService = lazy(() => import('./pages/Legal').then(module => ({ defa
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-  
   if (!token || token === 'undefined' || token === 'null') {
     return <Navigate to="/xradmin" replace />;
   }
-  
   return children;
 };
 
 function AppContent() {
   const location = useLocation();
-  
   const isAuth = ['/login', '/xradmin'].includes(location.pathname) || 
                  location.pathname.startsWith('/admin') || 
                  location.pathname.startsWith('/invoice');
@@ -92,18 +90,12 @@ function AppContent() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
-            
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            
             <Route path="/invoice/:id" element={<Invoice />} />
-            
             <Route path="/login" element={<ClientPortal />} />
-
             <Route path="/xradmin" element={<SecretAdminLogin />} />
-
             <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
-
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminProvider>
@@ -120,14 +112,11 @@ function AppContent() {
               <Route path="blogs/new" element={<AdminBlogEditor />} />
               <Route path="blogs/edit/:id" element={<AdminBlogEditor />} />
             </Route>
-
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
-      
       {!isAuth && <WhatsAppButton />} 
-      
       {!isAuth && <Footer />}
     </div>
   );
@@ -136,6 +125,8 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
+      <AnalyticsTracker /> 
+      
       <HelmetProvider>
         <ErrorBoundary>
           <AuthProvider>
