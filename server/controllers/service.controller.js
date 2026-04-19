@@ -1,4 +1,5 @@
 import Service from '../models/Service.js';
+import { uploadToCloudinary } from '../middleware/upload.middleware.js';
 
 export const createService = async (req, res) => {
   try {
@@ -7,11 +8,13 @@ export const createService = async (req, res) => {
     const featuresArray = req.body.features ? req.body.features.split(',').map(f => f.trim()).filter(Boolean) : [];
     const benefitsArray = req.body.benefits ? req.body.benefits.split(',').map(b => b.trim()).filter(Boolean) : [];
 
+    const cloudUrl = await uploadToCloudinary(req.file.path);
+
     const service = await Service.create({
       ...req.body,
       features: featuresArray,
       benefits: benefitsArray,
-      imageUrl: req.file.path
+      imageUrl: cloudUrl
     });
 
     res.status(201).json({ success: true, data: { service }, message: "Service created" });
@@ -39,7 +42,10 @@ export const updateService = async (req, res) => {
     
     if (req.body.features) updatedData.features = req.body.features.split(',').map(f => f.trim()).filter(Boolean);
     if (req.body.benefits) updatedData.benefits = req.body.benefits.split(',').map(b => b.trim()).filter(Boolean);
-    if (req.file) updatedData.imageUrl = req.file.path;
+    
+    if (req.file) {
+      updatedData.imageUrl = await uploadToCloudinary(req.file.path);
+    }
 
     service = await Service.findByIdAndUpdate(req.params.id, updatedData, { new: true });
     res.status(200).json({ success: true, data: { service }, message: "Service updated" });

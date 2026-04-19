@@ -1,14 +1,15 @@
 import Portfolio from '../models/Portfolio.js';
+import { uploadToCloudinary } from '../middleware/upload.middleware.js'; 
 
 export const createProject = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: "Image is required" });
 
-    const imageUrl = req.file.path;
+    const cloudUrl = await uploadToCloudinary(req.file.path);
     
     const project = await Portfolio.create({
       ...req.body,
-      imageUrl: imageUrl
+      imageUrl: cloudUrl
     });
 
     res.status(201).json({ success: true, data: { project }, message: "Project added successfully" });
@@ -61,7 +62,7 @@ export const updateProject = async (req, res) => {
     const updatedData = { ...req.body };
 
     if (req.file) {
-      updatedData.imageUrl = req.file.path; 
+      updatedData.imageUrl = await uploadToCloudinary(req.file.path); 
     }
 
     project = await Portfolio.findByIdAndUpdate(req.params.id, updatedData, { new: true });
