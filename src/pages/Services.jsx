@@ -13,6 +13,17 @@ const iconMap = {
   Code: Code
 };
 
+const getSectionId = (title) => {
+  const t = title.toLowerCase();
+  if (t.includes('web development')) return 'web-development';
+  if (t.includes('ui/ux') || t.includes('ui ux')) return 'ui-ux';
+  if (t.includes('seo')) return 'seo';
+  if (t.includes('e-commerce') || t.includes('ecommerce')) return 'ecommerce';
+  if (t.includes('digital marketing')) return 'digital-marketing';
+  
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+};
+
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +76,7 @@ export default function Services() {
               return (
                 <motion.div
                   key={service._id}
-                  id={service.title.toLowerCase().replace(/\s+/g, '-')}
+                  id={getSectionId(service.title)}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
