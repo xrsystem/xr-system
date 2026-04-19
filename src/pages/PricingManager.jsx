@@ -13,9 +13,13 @@ export default function PricingManager() {
     name: '', price: '', originalPrice: '', discountBadge: '', category: 'Web Development', description: '', features: '', isPopular: false, iconName: '' 
   });
 
+  const getAuthConfig = () => ({
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}` }
+  });
+
   const fetchPlans = async () => {
     try {
-      const response = await axios.get('/api/pricing');
+      const response = await axios.get('/api/pricing', getAuthConfig());
       if (response.data?.data?.plans) setPlans(response.data.data.plans);
     } catch (error) { console.error("Failed", error); } 
     finally { setLoading(false); }
@@ -50,8 +54,8 @@ export default function PricingManager() {
     };
 
     try {
-      if (editingId) await axios.put(`/api/pricing/${editingId}`, payload);
-      else await axios.post('/api/pricing', payload);
+      if (editingId) await axios.put(`/api/pricing/${editingId}`, payload, getAuthConfig());
+      else await axios.post('/api/pricing', payload, getAuthConfig());
       
       setShowForm(false);
       setEditingId(null);
@@ -63,14 +67,19 @@ export default function PricingManager() {
 
   const toggleStatus = async (id, currentStatus) => {
     setPlans(plans.map(p => p._id === id ? { ...p, isActive: !currentStatus } : p));
-    try { await axios.patch(`/api/pricing/${id}/status`); } 
+    try { 
+      await axios.patch(`/api/pricing/${id}/status`, {}, getAuthConfig()); 
+    } 
     catch (error) { setPlans(plans.map(p => p._id === id ? { ...p, isActive: currentStatus } : p)); }
   };
 
   const deletePlan = async (id) => {
     if(!window.confirm("Delete this plan?")) return;
-    try { await axios.delete(`/api/pricing/${id}`); setPlans(plans.filter(p => p._id !== id)); } 
-    catch (error) { alert("Failed"); }
+    try { 
+      await axios.delete(`/api/pricing/${id}`, getAuthConfig()); 
+      setPlans(plans.filter(p => p._id !== id)); 
+    } 
+    catch (error) { alert("Failed to delete"); }
   };
 
   return (
@@ -145,44 +154,46 @@ export default function PricingManager() {
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {loading ? ( <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-brand-600" /></div> ) 
         : plans.length === 0 ? ( <div className="p-8 text-center text-slate-500">No plans added yet.</div> ) : (
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
-              <tr>
-                <th className="px-6 py-4">Plan Name & Category</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4 text-center">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {plans.map(plan => (
-                <tr key={plan._id} className={plan.isPopular ? 'bg-brand-50/30' : ''}>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-slate-900">{plan.name}</p>
-                      {plan.isPopular && <span className="bg-brand-100 text-brand-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Popular</span>}
-                    </div>
-                    <p className="text-xs text-slate-500 font-bold uppercase mt-1">{plan.category}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="font-bold text-slate-900">₹{plan.price.toLocaleString()}</span>
-                    {plan.originalPrice && <span className="text-slate-400 line-through ml-2 text-xs">₹{plan.originalPrice.toLocaleString()}</span>}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-center">
-                      <button onClick={() => toggleStatus(plan._id, plan.isActive)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${plan.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}>
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${plan.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => handleEditClick(plan)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Edit2 size={16} /></button>
-                    <button onClick={() => deletePlan(plan._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
-                  </td>
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-sm min-w-175">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">Plan Name & Category</th>
+                  <th className="px-6 py-4">Price</th>
+                  <th className="px-6 py-4 text-center">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {plans.map(plan => (
+                  <tr key={plan._id} className={plan.isPopular ? 'bg-brand-50/30' : ''}>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-slate-900">{plan.name}</p>
+                        {plan.isPopular && <span className="bg-brand-100 text-brand-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Popular</span>}
+                      </div>
+                      <p className="text-xs text-slate-500 font-bold uppercase mt-1">{plan.category}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-slate-900">₹{plan.price.toLocaleString()}</span>
+                      {plan.originalPrice && <span className="text-slate-400 line-through ml-2 text-xs">₹{plan.originalPrice.toLocaleString()}</span>}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        <button onClick={() => toggleStatus(plan._id, plan.isActive)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${plan.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${plan.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button onClick={() => handleEditClick(plan)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg mr-2"><Edit2 size={16} /></button>
+                      <button onClick={() => deletePlan(plan._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
