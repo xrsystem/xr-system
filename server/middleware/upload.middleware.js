@@ -29,7 +29,7 @@ export const uploadToCloudinary = async (localFilePath) => {
     const result = await cloudinary.uploader.upload(localFilePath, {
       folder: 'xr_system_portfolio',
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-      transformation: [{ width: 1000, crop: "limit" }] 
+      transformation: [{ width: 1000, crop: "limit", fetch_format: "auto", quality: "auto" }] 
     });
     
     fs.unlinkSync(localFilePath);

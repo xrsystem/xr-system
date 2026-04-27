@@ -20,7 +20,6 @@ const getSectionId = (title) => {
   if (t.includes('seo')) return 'seo';
   if (t.includes('e-commerce') || t.includes('ecommerce')) return 'ecommerce';
   if (t.includes('digital marketing')) return 'digital-marketing';
-  
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 };
 
@@ -131,6 +130,8 @@ export default function Services() {
                         alt={service.title}
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   </div>

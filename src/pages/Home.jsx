@@ -102,10 +102,26 @@ export default function Home() {
   ];
 
   const steps = [
-    { number: '01', title: 'Share Requirement', desc: 'Tell us about your business goals and project needs.' },
-    { number: '02', title: 'Design & Develop', desc: 'Our experts build your custom solution with precision.' },
-    { number: '03', title: 'Review & Launch', desc: 'We refine the product based on your feedback and go live.' },
-    { number: '04', title: 'Ongoing Support', desc: 'We provide continuous maintenance and updates.' },
+    { 
+      number: '01', 
+      title: 'Share Requirement', 
+      desc: 'Tell us about your business goals and project needs.' 
+    },
+    { 
+      number: '02', 
+      title: 'Design & Develop', 
+      desc: 'Our experts build your custom solution with precision.' 
+    },
+    { 
+      number: '03', 
+      title: 'Review & Launch', 
+      desc: 'We refine the product based on your feedback and go live.' 
+    },
+    { 
+      number: '04', 
+      title: 'Ongoing Support', 
+      desc: 'We provide continuous maintenance and updates.' 
+    },
   ];
 
   if (isLoading) {
@@ -124,7 +140,6 @@ export default function Home() {
         keywords="Software Service Company, Website Development Company in Ranchi, Web Design Company in Ranchi, SEO Services in Ranchi Jharkhand, Digital Marketing Company in Ranchi, UI UX Design Services Ranchi, E-commerce Website Development Ranchi, XR System"
       />
       
-      {/* SCHEMA MARKUP WITH SOCIAL LINKS & TITLE */}
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
@@ -326,10 +341,16 @@ export default function Home() {
             </div>
             
             <div className="relative">
-            
               <div className="rounded-3xl overflow-hidden shadow-2xl bg-slate-200 h-125 flex items-center justify-center relative">
                 {siteSettings?.homeBanner ? (
-                  <img src={siteSettings.homeBanner} alt="XR System Banner" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <img 
+                    src={siteSettings.homeBanner} 
+                    alt="XR System Banner" 
+                    className="w-full h-full object-cover" 
+                    fetchPriority="high" 
+                    decoding="async" 
+                    referrerPolicy="no-referrer" 
+                  />
                 ) : (
                   <div className="absolute inset-0 bg-linear-to-br from-brand-600 to-slate-900 flex flex-col items-center justify-center text-white/50">
                     <ImageIcon size={64} className="mb-4 opacity-50" />
@@ -366,10 +387,16 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-4 not-italic mt-auto">
                   
-                  
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0 bg-brand-50 flex items-center justify-center">
                     {t.image ? (
-                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+                      <img 
+                        src={t.image} 
+                        alt={t.name} 
+                        className="w-full h-full object-cover" 
+                        referrerPolicy="no-referrer" 
+                        loading="lazy" 
+                        decoding="async" 
+                      />
                     ) : (
                       <span className="text-brand-600 font-bold text-lg">{t.name.charAt(0)}</span>
                     )}
