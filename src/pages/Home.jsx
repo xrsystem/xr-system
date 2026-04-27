@@ -124,7 +124,6 @@ export default function Home() {
     },
   ];
 
-
   return (
     <div className="flex flex-col">
       <SEO 
@@ -172,7 +171,11 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto text-center">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 text-brand-600 text-sm font-bold mb-8">
               <Rocket size={16} />
               Leading Agency in Ranchi
@@ -220,20 +223,31 @@ export default function Home() {
                 Affordable Pricing
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       <section className="py-24 px-6 bg-slate-50 overflow-hidden">
         <div className="max-w-7xl mx-auto relative">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl lg:text-5xl mb-6">Core Services</h2>
             <p className="text-slate-600 text-lg">
               We provide business-focused digital solutions designed to drive results.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="relative group/slider">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="relative group/slider"
+          >
             <button 
               onClick={() => scroll('left')}
               className="hidden md:flex absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white border border-slate-200 items-center justify-center text-slate-600 hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all shadow-xl opacity-0 group-hover/slider:opacity-100 active:scale-95"
@@ -254,7 +268,7 @@ export default function Home() {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {services.map((service, i) => (
-                <motion.div
+                <div
                   key={i}
                   className="min-w-full md:min-w-100 bg-white p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-500 group snap-center md:snap-start"
                 >
@@ -267,25 +281,37 @@ export default function Home() {
                     Learn More
                     <ArrowRight size={18} className="group-hover/link:translate-x-1 transition-transform" />
                   </HashLink>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl lg:text-5xl mb-6">How It Works</h2>
             <p className="text-slate-600 text-lg">
               Our simple 4-step process to bring your digital vision to life.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {steps.map((step, i) => (
-              <div key={i} className="relative group">
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                className="relative group"
+              >
                 <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all h-full">
                   <div className="text-4xl font-display font-bold text-brand-100 mb-4 group-hover:text-brand-200 transition-colors">
                     {step.number}
@@ -296,7 +322,7 @@ export default function Home() {
                 {i < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-px bg-slate-200 z-10" />
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -305,7 +331,11 @@ export default function Home() {
       <section className="py-24 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
               <h2 className="text-3xl lg:text-5xl mb-8">Why Choose <span className="text-brand-600">XR System?</span></h2>
               <p className="text-slate-600 text-lg mb-12 leading-relaxed">
                 We combine local expertise with global standards to deliver exceptional value.
@@ -327,9 +357,14 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
             
-            <div className="relative">
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
               <div className="rounded-3xl overflow-hidden shadow-2xl bg-slate-200 min-h-100 lg:min-h-125 w-full flex items-center justify-center relative">
                 {isLoading ? (
                   <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
@@ -351,24 +386,33 @@ export default function Home() {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl lg:text-5xl mb-6">What Our Leaders Say</h2>
             <p className="text-slate-600 text-lg">
               Our commitment to excellence starts from the top.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {testimonials.map((t, i) => (
               <motion.div
                 key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -10 }}
                 className="bg-white p-8 rounded-3xl border border-slate-100 italic text-slate-700 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between"
               >
