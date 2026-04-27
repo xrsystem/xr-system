@@ -124,13 +124,6 @@ export default function Home() {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-600" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col">
@@ -179,16 +172,12 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 text-brand-600 text-sm font-bold mb-8">
               <Rocket size={16} />
               Leading Agency in Ranchi
             </div>
-            <h1 className="text-5xl lg:text-7xl font-display font-bold leading-tight mb-8 tracking-tight max-w-4xl mx-auto">
+            <h1 className="text-5xl lg:text-7xl font-display font-bold leading-tight mb-8 tracking-tight max-w-4xl mx-auto text-slate-900">
               We Build Websites That Help Your <span className="text-brand-600">Business Grow 🚀</span>
             </h1>
             <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
@@ -231,7 +220,7 @@ export default function Home() {
                 Affordable Pricing
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -341,12 +330,16 @@ export default function Home() {
             </div>
             
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden shadow-2xl bg-slate-200 h-125 flex items-center justify-center relative">
-                {siteSettings?.homeBanner ? (
+              <div className="rounded-3xl overflow-hidden shadow-2xl bg-slate-200 min-h-100 lg:min-h-125 w-full flex items-center justify-center relative">
+                {isLoading ? (
+                  <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+                  </div>
+                ) : siteSettings?.homeBanner ? (
                   <img 
                     src={siteSettings.homeBanner} 
                     alt="XR System Banner" 
-                    className="w-full h-full object-cover" 
+                    className="w-full h-full object-cover absolute inset-0" 
                     fetchPriority="high" 
                     decoding="async" 
                     referrerPolicy="no-referrer" 
@@ -354,7 +347,7 @@ export default function Home() {
                 ) : (
                   <div className="absolute inset-0 bg-linear-to-br from-brand-600 to-slate-900 flex flex-col items-center justify-center text-white/50">
                     <ImageIcon size={64} className="mb-4 opacity-50" />
-                    <p className="font-display font-bold tracking-widest uppercase">Update Banner in Admin</p>
+                    <p className="font-display font-bold tracking-widest uppercase text-center px-4">Update Banner in Admin</p>
                   </div>
                 )}
               </div>
@@ -387,8 +380,10 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-4 not-italic mt-auto">
                   
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0 bg-brand-50 flex items-center justify-center">
-                    {t.image ? (
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100 shrink-0 bg-brand-50 flex items-center justify-center relative">
+                    {isLoading ? (
+                      <div className="w-full h-full bg-slate-200 animate-pulse" />
+                    ) : t.image ? (
                       <img 
                         src={t.image} 
                         alt={t.name} 
