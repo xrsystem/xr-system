@@ -4,47 +4,66 @@ import Lead from '../models/Lead.js';
 
 export const protectAdmin = (req, res, next) => {
   let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+
+  if (req.headers.authorization?.startsWith("Bearer")) {
     try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_ADMIN_SECRET);
+
+      if (decoded.role !== "admin") {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Access denied. Admins only.",
+        });
+      }
+
       req.admin = decoded;
-      next();
+      return next();
     } catch (error) {
-      res.status(StatusCodes.UNAUTHORIZED).json({ message: "Not authorized, invalid token" });
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Invalid or expired token",
+      });
     }
   }
-  if (!token) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ message: "Not authorized, no token provided" });
-  }
+
+  return res.status(StatusCodes.UNAUTHORIZED).json({
+    message: "No token provided",
+  });
 };
 
 export const protectClient = async (req, res, next) => {
   let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+
+  if (req.headers.authorization?.startsWith("Bearer")) {
     try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-      
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_CLIENT_SECRET);
+
       const client = await Lead.findById(decoded.id);
-      
+
       if (!client) {
-        return res.status(StatusCodes.NOT_FOUND).json({ message: "Client not found" });
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Client not found",
+        });
       }
 
-      if (client.portalAccess === false) {
-        return res.status(StatusCodes.FORBIDDEN).json({ 
-          message: "Aapka dashboard access disable kar diya gaya hai. Please contact XR System." 
+      if (!client.portalAccess) {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Access disabled. Contact XR System.",
         });
       }
 
       req.client = client;
-      next();
+      return next();
     } catch (error) {
-      res.status(StatusCodes.UNAUTHORIZED).json({ message: "Not authorized, token failed" });
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Token failed",
+      });
     }
   }
-  if (!token) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ message: "Not authorized, please login" });
-  }
+
+  return res.status(StatusCodes.UNAUTHORIZED).json({
+    message: "Please login",
+  });
 };

@@ -7,6 +7,8 @@ import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import fs from "fs";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
 
 import logger from "./server/config/logger.js";
 import { errorMiddleware } from "./server/middleware/errorMiddleware.js";
@@ -36,9 +38,7 @@ async function startServer() {
   
   app.set("trust proxy", 1);
   
-  app.use(helmet({
-    contentSecurityPolicy: false, 
-  }));
+  app.use(helmet()); 
   
   const allowedOrigins = [
     process.env.CLIENT_URL,
@@ -69,6 +69,9 @@ async function startServer() {
   
   app.use(cookieParser());
   app.use(express.json());
+
+  app.use(mongoSanitize());
+  app.use(xss());
 
   app.use("/api", (req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -111,6 +114,10 @@ async function startServer() {
 
   app.get("/api/health", (req, res) => {
     res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { status: "UP" }, "Server is healthy"));
+  });
+
+  app.get("/", (req, res) => {
+    res.send("XR System API is running Securely 🚀");
   });
 
   app.use(errorMiddleware);

@@ -1,28 +1,51 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import rateLimit from 'express-rate-limit';
+import { body, validationResult } from 'express-validator';
 import Lead from '../models/Lead.js';
 import { sendPortalLink } from '../services/email.service.js';
 
 const router = express.Router();
 
-router.post('/login', (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message: "Too many login attempts. Try again later.",
+});
+
+router.post('/login', loginLimiter, [
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ], async (req, res) => {
+  
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { email, password } = req.body;
 
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-    
-    const token = jwt.sign(
-      { role: 'admin', email: email }, 
-      process.env.JWT_ACCESS_SECRET, 
-      { expiresIn: '7d' } 
-    );
-    
-    return res.status(200).json({ 
-      message: "Welcome Admin!", 
-      token: token 
-    });
+  try {
+    const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
 
-  } else {
-    return res.status(401).json({ message: "Invalid email or password. Access Denied." });
+    if (email !== process.env.ADMIN_EMAIL || !isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { role: "admin", email },
+      process.env.JWT_ADMIN_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+    });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
