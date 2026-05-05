@@ -9,8 +9,8 @@ import { createInvoicePaymentLink, sendInvoiceEmail } from '../services/billing.
 import cron from 'node-cron';
 
 const getPlanAmount = (service, source) => {
-  if (source === 'contact') return 0; 
-  if (!service) return 0;
+  if (source === 'contact') return 0;
+  if (!service || typeof service !== 'string') return 0; 
   const s = service.toLowerCase();
   if (s.includes('basic care')) return 1500;
   if (s.includes('growth care')) return 3500;
@@ -23,36 +23,48 @@ const getPlanAmount = (service, source) => {
   return 0;
 };
 
-export const createLead = asyncHandler(async (req, res) => {
-  const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails, advancePaid } = req.body;
-  const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
-  
-  const lead = await Lead.create({ 
-    name, email, whatsapp, businessName, websiteUrl, service, message, 
-    price: amount, 
-    advancePaid: advancePaid ? Number(advancePaid) : 0 
-  });
+export const createLead = async (req, res, next) => {
+  try {
+    const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails, advancePaid } = req.body;
+    const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
+    
+    const lead = await Lead.create({ 
+      name, email, whatsapp, businessName, websiteUrl, service, message, 
+      price: amount, 
+      advancePaid: advancePaid ? Number(advancePaid) : 0 
+    });
 
-  try {
-    await onboardingService.sendClientConfirmation(lead);
-    await onboardingService.sendAdminNotification(lead);
-  } catch (emailError) {
-    console.error("⚠️ Email Sending Failed (Ignored):", emailError.message);
-  }
-  
-  try {
-    const notionPageId = await addLeadToNotion(lead, amount, promoDetails);
-    if (notionPageId) {
-      lead.notionPageId = notionPageId;
-      await lead.save();
+    try {
+      await onboardingService.sendClientConfirmation(lead);
+      await onboardingService.sendAdminNotification(lead);
+    } catch (emailError) {
+      console.error("⚠️ Email Sending Failed (Ignored):", emailError.message);
     }
-  } catch (notionError) {
-    console.error("⚠️ Notion Integration Failed (Ignored):", notionError.message);
-  }
+    
+    try {
+      const notionPageId = await addLeadToNotion(lead, amount, promoDetails);
+      if (notionPageId) {
+        lead.notionPageId = notionPageId;
+        await lead.save();
+      }
+    } catch (notionError) {
+      console.error("⚠️ Notion Integration Failed (Ignored):", notionError.message);
+    }
 
-  let paymentLink = null;
-  res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead/Invoice created successfully"));
-});
+    let paymentLink = null;
+    res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead/Invoice created successfully"));
+  
+  } catch (error) {
+    console.error("🔴 Lead Creation Error:", error);
+    if (typeof next === 'function') {
+      return next(error);
+    } else {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
+        new ApiResponse(StatusCodes.INTERNAL_SERVER_ERROR, null, error.message || "Failed to create lead")
+      );
+    }
+  }
+};
 
 export const getLeadById = asyncHandler(async (req, res) => {
   const lead = await Lead.findById(req.params.id);
@@ -64,7 +76,7 @@ export const getLeadById = asyncHandler(async (req, res) => {
 });
 
 export const getLeads = asyncHandler(async (req, res) => {
-  const leads = await Lead.find({}).sort({ createdAt: -1 }); 
+  const leads = await Lead.find({}).sort({ createdAt: -1 });
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { leads }, "Leads fetched successfully"));
 });
 
@@ -77,8 +89,8 @@ export const togglePortalAccess = asyncHandler(async (req, res) => {
   lead.portalAccess = portalAccess;
   await lead.save();
 
-  if (lead.notionPageId) { 
-    try { await updateNotionPortalAccess(lead.notionPageId, portalAccess); } 
+  if (lead.notionPageId) {
+    try { await updateNotionPortalAccess(lead.notionPageId, portalAccess); }
     catch(e) { console.error("Notion Sync Error:", e.message); }
   }
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { lead }, `Portal access updated`));
@@ -93,7 +105,7 @@ export const updateLeadStatus = asyncHandler(async (req, res) => {
   lead.status = status;
   await lead.save();
 
-  if (lead.notionPageId) { 
+  if (lead.notionPageId) {
     try { await updateNotionLeadStatus(lead.notionPageId, status); }
     catch(e) { console.error("Notion Sync Error:", e.message); }
   }
@@ -113,7 +125,7 @@ export const markLeadsAsRead = asyncHandler(async (req, res) => {
 
 export const processAndSendInvoice = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { invoiceType, amountToPay, totalValue } = req.body; 
+  const { invoiceType, amountToPay, totalValue } = req.body;
 
   const lead = await Lead.findById(id);
   if (!lead) {
