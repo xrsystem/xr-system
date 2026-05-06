@@ -10,6 +10,7 @@ import cron from 'node-cron';
 
 const getPlanAmount = (service, source) => {
   if (source === 'contact') return 0;
+  // 🟢 NAYA FIX: Ensure service is a valid string to prevent .toLowerCase() crash
   if (!service || typeof service !== 'string') return 0; 
   const s = service.toLowerCase();
   if (s.includes('basic care')) return 1500;
@@ -23,6 +24,7 @@ const getPlanAmount = (service, source) => {
   return 0;
 };
 
+// 🟢 NAYA FIX: asyncHandler hata kar robust try...catch lagaya gaya hai
 export const createLead = async (req, res, next) => {
   try {
     const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails, advancePaid } = req.body;
@@ -56,6 +58,7 @@ export const createLead = async (req, res, next) => {
   
   } catch (error) {
     console.error("🔴 Lead Creation Error:", error);
+    // 🟢 SAFE FALLBACK: Agar route se 'next' nahi mila, toh direct 500 status bhej dega
     if (typeof next === 'function') {
       return next(error);
     } else {
