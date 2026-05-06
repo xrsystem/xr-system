@@ -35,7 +35,7 @@ const leadSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-leadSchema.pre('save', function(next) {
+leadSchema.pre('save', function() {
   if (this.invoiceItems && this.invoiceItems.length > 0) {
     this.subTotal = this.invoiceItems.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
     this.finalTotal = this.subTotal - (Number(this.discountAmount) || 0) + (Number(this.taxAmount) || 0);
@@ -44,7 +44,6 @@ leadSchema.pre('save', function(next) {
     this.finalTotal = this.price || 0;
     this.subTotal = this.price || 0;
   }
-  next();
 });
 
 const Lead = mongoose.model('Lead', leadSchema);

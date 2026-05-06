@@ -10,7 +10,6 @@ import cron from 'node-cron';
 
 const getPlanAmount = (service, source) => {
   if (source === 'contact') return 0;
-  // 🟢 NAYA FIX: Ensure service is a valid string to prevent .toLowerCase() crash
   if (!service || typeof service !== 'string') return 0; 
   const s = service.toLowerCase();
   if (s.includes('basic care')) return 1500;
@@ -24,8 +23,7 @@ const getPlanAmount = (service, source) => {
   return 0;
 };
 
-// 🟢 NAYA FIX: asyncHandler hata kar robust try...catch lagaya gaya hai
-export const createLead = async (req, res, next) => {
+export const createLead = async (req, res) => {
   try {
     const { name, email, whatsapp, businessName, websiteUrl, service, message, source, price, promoDetails, advancePaid } = req.body;
     const amount = price !== undefined ? Number(price) : getPlanAmount(service, source);
@@ -53,19 +51,16 @@ export const createLead = async (req, res, next) => {
       console.error("⚠️ Notion Integration Failed (Ignored):", notionError.message);
     }
 
-    let paymentLink = null;
-    res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink }, "Lead/Invoice created successfully"));
+    return res.status(StatusCodes.CREATED).json(new ApiResponse(StatusCodes.CREATED, { lead, paymentLink: null }, "Lead/Invoice created successfully"));
   
   } catch (error) {
     console.error("🔴 Lead Creation Error:", error);
-    // 🟢 SAFE FALLBACK: Agar route se 'next' nahi mila, toh direct 500 status bhej dega
-    if (typeof next === 'function') {
-      return next(error);
-    } else {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-        new ApiResponse(StatusCodes.INTERNAL_SERVER_ERROR, null, error.message || "Failed to create lead")
-      );
-    }
+    return res.status(500).json({
+      success: false,
+      statusCode: 500,
+      message: "Debug: " + (error.message || "Failed to create lead"),
+      flag: "100_PERCENT_NEW_CODE"
+    });
   }
 };
 
@@ -235,7 +230,6 @@ export const razorpayWebhook = asyncHandler(async (req, res) => {
     res.status(400).json({ status: "invalid signature" });
   }
 });
-
 
 cron.schedule('0 8 * * *', async () => {
   try {
