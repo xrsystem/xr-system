@@ -15,36 +15,66 @@
   --color-brand-700: #4338ca;
   --color-brand-800: #3730a3;
   --color-brand-900: #312e81;
+
+  --color-background: var(--bg-color);
+  --color-surface: var(--surface-color);
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-border: var(--border-color);
 }
 
 @layer base {
+  :root {
+    --bg-color: #ffffff;
+    --surface-color: #f8f9fa;
+    --text-heading: #0f172a;
+    --text-body: #475569;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+  }
+
+  .dark {
+    --bg-color: #0a0a0a;
+    --surface-color: #111111;
+    --text-heading: #ffffff;
+    --text-body: #a1a1aa;
+    --text-muted: #52525b;
+    --border-color: #222222;
+  }
+
   body {
-    @apply font-sans text-slate-900 bg-white;
+    @apply bg-(--bg-color) text-(--text-body) font-sans antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+    @apply text-(--text-heading) font-display tracking-tight; 
+  }
+
+  a, button, input, select, textarea {
+    @apply transition-all duration-300 ease-in-out;
   }
 }
 
-.glass {
-  @apply bg-white/85 backdrop-blur-2xl border border-white/20;
-}
+@layer utilities {
+  .glow-border {
+    @apply border border-(--border-color) hover:border-brand-500/50 transition-colors duration-300;
+  }
+  
+  .dark .glow-border:hover {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15); 
+  }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+  .glass-panel {
+    @apply bg-(--surface-color)/80 backdrop-blur-md border border-(--border-color);
+  }
 
-.premium-blog h1, .premium-blog h2, .premium-blog h3, .premium-blog h4 {
-  font-family: 'Playfair Display', serif !important;
-  font-weight: bold;
-  letter-spacing: -0.02em;
-}
-.premium-blog p, .premium-blog li, .premium-blog blockquote, .premium-blog span {
-  font-family: 'Lora', serif !important;
-  color: #334155 !important;
-  line-height: 1.8 !important;
-}
-.premium-blog blockquote {
-  font-style: italic;
-  border-left-color: #4f46e5 !important;
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-linear-to-r from-neutral-900 to-neutral-500;
+  }
+  
+  .dark .text-gradient {
+    @apply from-white to-neutral-400;
+  }
 }
