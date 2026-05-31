@@ -149,54 +149,23 @@ export default function Home() {
 
       <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 px-6 overflow-hidden">
         
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-slate-50/40">
+          <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] bg-size-[24px_24px] opacity-40"></div>
+          
           <motion.div 
-            animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-125 bg-brand-400/20 rounded-full blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+            animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 -left-20 w-100 h-100 bg-purple-400/20 rounded-full blur-[100px]" 
+            className="absolute top-10 -left-20 lg:-left-40 w-100 h-100 lg:w-150 lg:h-150 bg-brand-300/30 rounded-full blur-[120px]" 
           />
+          
           <motion.div 
-            animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-40 -right-20 w-100 h-100 bg-blue-400/20 rounded-full blur-[100px]" 
+            animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-40 -right-20 lg:-right-40 w-100 h-100 lg:w-150 lg:h-150 bg-indigo-400/20 rounded-full blur-[120px]" 
           />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          
-          <motion.div 
-            animate={{ y: [0, -15, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="hidden lg:flex absolute top-10 left-0 bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center border border-green-100">
-              <Check size={24} strokeWidth={2.5} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Project Success</p>
-              <p className="text-base font-bold text-slate-900">100% Delivered</p>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            animate={{ y: [0, 15, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-            className="hidden lg:flex absolute bottom-20 right-0 bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center border border-brand-100">
-              <Code size={24} strokeWidth={2.5} />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Tech Stack</p>
-              <p className="text-base font-bold text-slate-900">Modern MERN</p>
-            </div>
-          </motion.div>
-
           <div className="text-center max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -391,26 +360,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="relative"
             >
-              {/* Floating UI Elements for dynamic feel */}
-              <div className="absolute -left-8 top-12 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 z-20 animate-[bounce_6s_infinite]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center"><Check size={20} /></div>
-                  <div>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Project Success</p>
-                    <p className="text-lg font-bold text-slate-900">100%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute -right-8 bottom-12 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 z-20 animate-[bounce_7s_infinite_reverse]">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3].map(i => <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white"></div>)}
-                  </div>
-                  <p className="text-sm font-bold text-slate-900">Happy Clients</p>
-                </div>
-              </div>
-
+              {/* Clean Image Container (No floating badges) */}
               <div className="rounded-[2.5rem] overflow-hidden shadow-2xl shadow-brand-500/10 border-8 border-white bg-slate-100 min-h-100 lg:min-h-150 w-full flex items-center justify-center relative z-10">
                 {isLoading ? (
                   <div className="absolute inset-0 bg-slate-100 animate-pulse flex items-center justify-center">
@@ -437,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🌟 UPGRADED TESTIMONIALS */}
+      {/* 🌟 TESTIMONIALS */}
       <section className="py-24 px-6 bg-slate-50/50">
         <div className="max-w-7xl mx-auto">
           <motion.div 
