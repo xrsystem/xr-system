@@ -147,78 +147,113 @@ export default function Home() {
         </script>
       </Helmet>
 
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6">
-        <div className="absolute inset-0 -z-10 overflow-hidden bg-slate-50/50">
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 px-6 overflow-hidden">
+        
+        <div className="absolute inset-0 -z-10 overflow-hidden">
           <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-150 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_60%)]" 
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-125 bg-brand-400/20 rounded-full blur-[120px]" 
           />
           <motion.div 
-            animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 -left-20 w-125 h-125 bg-brand-400/20 rounded-full blur-[100px]" 
+            className="absolute top-20 -left-20 w-100 h-100 bg-purple-400/20 rounded-full blur-[100px]" 
           />
           <motion.div 
-            animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+            animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-0 -right-20 w-125 h-125 bg-indigo-500/15 rounded-full blur-[100px]" 
+            className="absolute top-40 -right-20 w-100 h-100 bg-blue-400/20 rounded-full blur-[100px]" 
           />
         </div>
 
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+        <div className="max-w-7xl mx-auto relative z-10">
+          
+          <motion.div 
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="hidden lg:flex absolute top-10 left-0 bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white items-center gap-4"
           >
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-brand-100 shadow-sm text-brand-600 text-sm font-bold mb-8 cursor-pointer"
-            >
-              <Rocket size={16} className="text-brand-500" />
-              Leading Tech Agency in Ranchi
-            </motion.div>
-            
-            <h1 className="text-5xl lg:text-7xl font-display font-bold leading-[1.1] mb-8 tracking-tight max-w-5xl mx-auto text-slate-900">
-              We Build Websites That Help Your <br className="hidden lg:block"/>
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-600 to-indigo-400">
-                Business Grow 🚀
-              </span>
-            </h1>
-            
-            <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-              From simple websites to custom cloud platforms, we engineer digital experiences that convert visitors into loyal customers.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-5 mb-16">
-              <Link
-                to="/contact"
-                className="group relative bg-brand-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.4)] hover:-translate-y-1 flex items-center gap-2 overflow-hidden"
-              >
-                <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                Start Your Project
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/portfolio"
-                className="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 hover:-translate-y-1 transition-all shadow-sm"
-              >
-                View Portfolio
-              </Link>
+            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center border border-green-100">
+              <Check size={24} strokeWidth={2.5} />
             </div>
-
-            <div className="flex flex-wrap justify-center items-center gap-8 text-slate-600 font-medium border-t border-slate-200/60 pt-12">
-              {['Based in Ranchi', 'Fast Delivery', 'Affordable Pricing'].map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50">
-                    <Check size={14} strokeWidth={3} />
-                  </div>
-                  {feature}
-                </div>
-              ))}
+            <div>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Project Success</p>
+              <p className="text-base font-bold text-slate-900">100% Delivered</p>
             </div>
           </motion.div>
+
+          <motion.div 
+            animate={{ y: [0, 15, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="hidden lg:flex absolute bottom-20 right-0 bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white items-center gap-4"
+          >
+            <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center border border-brand-100">
+              <Code size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Tech Stack</p>
+              <p className="text-base font-bold text-slate-900">Modern MERN</p>
+            </div>
+          </motion.div>
+
+          <div className="text-center max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-brand-100 shadow-sm text-brand-600 text-sm font-bold mb-8 cursor-pointer"
+              >
+                <Rocket size={16} className="text-brand-500" />
+                Leading Tech Agency in Ranchi
+              </motion.div>
+              
+              <h1 className="text-5xl lg:text-7xl font-display font-bold leading-[1.1] mb-6 tracking-tight text-slate-900">
+                We Build Websites That Help Your{' '}
+                <span className="whitespace-nowrap">
+                  <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-600 to-indigo-400 inline-block mt-2">
+                    Business Grow
+                  </span>
+                  <span className="inline-block mt-2 ml-3">🚀</span>
+                </span>
+              </h1>
+              
+              <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+                From simple websites to custom cloud platforms, we engineer digital experiences that convert visitors into loyal customers.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-5 mb-16 relative z-20">
+                <Link
+                  to="/contact"
+                  className="group relative bg-brand-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.4)] hover:-translate-y-1 flex items-center gap-2 overflow-hidden"
+                >
+                  <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                  Start Your Project
+                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  to="/portfolio"
+                  className="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 hover:-translate-y-1 transition-all shadow-sm"
+                >
+                  View Portfolio
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap justify-center items-center gap-8 text-slate-600 font-medium border-t border-slate-200/60 pt-10">
+                {['Based in Ranchi', 'Fast Delivery', 'Affordable Pricing'].map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 shadow-sm border border-brand-100/50">
+                      <Check size={14} strokeWidth={3} />
+                    </div>
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
