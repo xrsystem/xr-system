@@ -64,7 +64,7 @@ export const uploadPdfToCloudinary = async (localFilePath) => {
   try {
     const result = await cloudinary.uploader.upload(localFilePath, {
       folder: 'xr_system_resumes',
-      resource_type: "raw",
+      resource_type: "auto",
     });
     fs.unlinkSync(localFilePath);
     return result.secure_url;

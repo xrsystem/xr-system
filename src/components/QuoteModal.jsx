@@ -70,7 +70,6 @@ export default function QuoteModal({ isOpen, onClose, selectedPlan }) {
     }
 
     try {
-      // ✅ FETCH KO HATA KAR AXIOS LAGA DIYA
       const res = await axios.post('/api/leads', {
         ...formData,
         service: serviceName,
