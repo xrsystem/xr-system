@@ -201,22 +201,24 @@ export default function JobDetails() {
                   <div className="grid md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">Full Name *</label>
-                      <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Jane Doe" />
+                      <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Enter your full name" />
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">Email Address *</label>
-                      <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="jane@example.com" />
+                      <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Enter your email address" />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">WhatsApp / Phone *</label>
-                      <input type="text" name="whatsapp" required value={formData.whatsapp} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="+91 98765 43210" />
+                      <input type="text" name="whatsapp" required value={formData.whatsapp} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Enter your WhatsApp number" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">LinkedIn Profile *</label>
-                      <input type="url" name="linkedin" required value={formData.linkedin} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="https://linkedin.com/in/..." />
+                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">
+                        LinkedIn Profile <span className="text-slate-400 font-normal lowercase">(Optional)</span>
+                      </label>
+                      <input type="url" name="linkedin" value={formData.linkedin} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Enter your LinkedIn profile URL" />
                     </div>
                   </div>
 
@@ -224,7 +226,7 @@ export default function JobDetails() {
                     <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">
                       GitHub / Portfolio <span className="text-slate-400 font-normal lowercase">(Optional)</span>
                     </label>
-                    <input type="url" name="portfolioUrl" value={formData.portfolioUrl} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="https://github.com/..." />
+                    <input type="url" name="portfolioUrl" value={formData.portfolioUrl} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Enter your GitHub or Portfolio URL" />
                   </div>
 
                   <div>
@@ -269,7 +271,7 @@ export default function JobDetails() {
                     <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">
                       Why are you a great fit? <span className="text-slate-400 font-normal lowercase">(Optional)</span>
                     </label>
-                    <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium resize-none leading-relaxed" placeholder="Tell us about a project you are proud of..."></textarea>
+                    <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium resize-none leading-relaxed" placeholder="Tell us why you are a great fit for this role..."></textarea>
                   </div>
 
                   <button type="submit" disabled={submitting || uploadingResume} className="w-full py-4 rounded-xl bg-brand-600 text-white font-bold text-base hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/25 disabled:opacity-70 mt-6 active:scale-[0.98] flex justify-center items-center gap-2">
