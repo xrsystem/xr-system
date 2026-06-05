@@ -42,11 +42,16 @@ export default function Careers() {
   }, []);
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-32 pb-24 overflow-hidden">
+    <div className="relative bg-slate-50 min-h-screen pt-32 pb-24 overflow-hidden z-0">
       <SEO title="Careers | XR System" description="Join the XR System team in Ranchi." />
       
-      <div className="max-w-7xl mx-auto px-6 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-100 bg-brand-400/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] bg-size-[24px_24px] opacity-40"></div>
+        <div className="absolute top-0 -left-40 w-150 h-150 bg-brand-300/20 rounded-full blur-[120px]" />
+        <div className="absolute top-40 -right-40 w-150 h-150 bg-indigo-400/10 rounded-full blur-[120px]" />
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
 
         <div className="text-center max-w-3xl mx-auto mb-24 relative z-10">
           <motion.div
@@ -89,7 +94,7 @@ export default function Careers() {
               whileHover={{ y: -8, scale: 1.02 }}
               className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-brand-100 transition-all duration-300"
             >
-              <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mb-6 border border-white shadow-sm">
                 <item.icon size={28} strokeWidth={1.5} />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
@@ -99,7 +104,7 @@ export default function Careers() {
         </motion.div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="flex justify-between items-end mb-10 pb-6 border-b border-slate-200">
+          <div className="flex justify-between items-end mb-10 pb-6 border-b border-slate-200/80">
             <h2 className="text-4xl font-display font-bold text-slate-900 tracking-tight">Open Positions</h2>
             <p className="text-brand-600 font-bold hidden md:block">{jobs.length} Roles Available</p>
           </div>
@@ -126,23 +131,23 @@ export default function Careers() {
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-10 transition-transform group-hover:scale-150 duration-500" />
                   
-                  <div className="flex-1">
+                  <div className="flex-1 relative z-10">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <h3 className="text-2xl font-bold text-slate-900 group-hover:text-brand-600 transition-colors tracking-tight">{job.title}</h3>
-                      <span className="px-3 py-1 bg-brand-50 text-brand-600 text-xs font-bold uppercase tracking-wider rounded-full">{job.department}</span>
+                      <span className="px-3 py-1 bg-brand-50 text-brand-600 text-[11px] font-bold uppercase tracking-widest rounded-full">{job.department}</span>
                     </div>
                     
                     <div className="flex flex-wrap gap-3 text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">
-                      <span className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg"><MapPin size={14} className="text-brand-500" /> {job.location}</span>
-                      <span className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg"><Clock size={14} className="text-brand-500" /> {job.type}</span>
-                      <span className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg"><GraduationCap size={14} className="text-brand-500" /> {job.experience}</span>
+                      <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg"><MapPin size={14} className="text-brand-500" /> {job.location}</span>
+                      <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg"><Clock size={14} className="text-brand-500" /> {job.type}</span>
+                      <span className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg"><GraduationCap size={14} className="text-brand-500" /> {job.experience}</span>
                     </div>
                     
                     <p className="text-slate-600 text-sm leading-relaxed max-w-2xl font-medium line-clamp-2">{job.description}</p>
                   </div>
                   
-                  <div className="shrink-0 mt-2 md:mt-0">
-                    <Link to={`/careers/${job._id}`} className="flex items-center justify-center gap-2 bg-brand-50 text-brand-600 px-6 py-4 rounded-2xl font-bold hover:bg-brand-600 hover:text-white transition-all w-full md:w-auto">
+                  <div className="shrink-0 mt-2 md:mt-0 relative z-10">
+                    <Link to={`/careers/${job._id}`} className="flex items-center justify-center gap-2 bg-brand-50 text-brand-600 px-7 py-4 rounded-xl font-bold hover:bg-brand-600 hover:text-white transition-all w-full md:w-auto shadow-sm">
                       View Role <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>
