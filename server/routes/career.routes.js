@@ -9,19 +9,26 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { name, email, whatsapp, portfolioUrl, resumeUrl, message, role } = req.body;
+    const { name, email, whatsapp, linkedin, portfolioUrl, resumeUrl, message, role } = req.body;
 
     const newApplication = new Career({
-      name, email, whatsapp, portfolioUrl, resumeUrl, message, role
+      name, email, whatsapp, linkedin, portfolioUrl, resumeUrl, message, role
     });
     await newApplication.save();
 
     const adminEmailSubject = ` NEW CANDIDATE: ${name} applied for ${role}`;
+    
     const adminEmailHtml = `
       <h2>New Job Application Received</h2>
-      <p><strong>Role:</strong> ${role}</p><p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p><p><strong>WhatsApp:</strong> ${whatsapp}</p>
-      <p><strong>Portfolio:</strong> <a href="${portfolioUrl}">Link</a></p>
+      <p><strong>Role:</strong> ${role}</p>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>WhatsApp:</strong> ${whatsapp}</p>
+      <p><strong>LinkedIn:</strong> ${linkedin ? `<a href="${linkedin}">View Profile</a>` : 'Not provided'}</p>
+      <p><strong>Portfolio:</strong> ${portfolioUrl ? `<a href="${portfolioUrl}">View Portfolio</a>` : 'Not provided'}</p>
+      <p><strong>Resume PDF:</strong> <a href="${resumeUrl}">Download / View PDF</a></p>
+      <br/>
+      <p><strong>Pitch / Message:</strong><br/> ${message || 'No message provided.'}</p>
     `;
     
     const candidateEmailHtml = `
@@ -49,7 +56,14 @@ router.post('/', async (req, res) => {
     await sendEmail(process.env.SMTP_USER, adminEmailSubject, adminEmailHtml);
 
     await addCandidateToNotion({
-      name, role, email, whatsapp, portfolioUrl, resumeUrl, message
+      name, 
+      role, 
+      email, 
+      whatsapp, 
+      linkedin: linkedin || undefined, 
+      portfolioUrl: portfolioUrl || undefined, 
+      resumeUrl, 
+      message: message || undefined
     });
 
     res.status(201).json({ success: true, message: 'Application received successfully!' });
