@@ -18,6 +18,7 @@ export const addCandidateToNotion = async (candidate) => {
         "Email": { email: candidate.email },
         "WhatsApp": { phone_number: String(candidate.whatsapp) },
         "Role": { select: { name: String(candidate.role) } },
+        "LinkedIn": { url: candidate.linkedin || null },
         "Portfolio": { url: candidate.portfolioUrl || null },
         "Resume": { url: candidate.resumeUrl || null },
         "Experience": { rich_text: [{ text: { content: String(candidate.message || "N/A").substring(0, 2000) } }] }
