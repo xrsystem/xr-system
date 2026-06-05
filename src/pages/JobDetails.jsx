@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ArrowLeft, MapPin, Clock, GraduationCap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, MapPin, Clock, GraduationCap, CheckCircle2, AlertCircle, UploadCloud, FileText, Loader2, X } from 'lucide-react';
 import SEO from '../components/SEO';
 import axios from 'axios';
 
@@ -12,9 +12,14 @@ export default function JobDetails() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', portfolioUrl: '', resumeUrl: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', whatsapp: '', linkedin: '', portfolioUrl: '', resumeUrl: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [resumeName, setResumeName] = useState("");
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -30,14 +35,74 @@ export default function JobDetails() {
         setLoading(false);
       }
     };
-
     fetchJobDetails();
   }, [id]);
 
   const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      await handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleChange = async (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      await handleFileUpload(e.target.files[0]);
+    }
+  };
+
+  const handleFileUpload = async (file) => {
+    if (file.type !== "application/pdf") {
+      alert("Please upload a valid PDF document.");
+      return;
+    }
+    
+    setUploadingResume(true);
+    const uploadData = new FormData();
+    uploadData.append("resume", file);
+    
+    try {
+      const res = await axios.post("/api/upload/resume", uploadData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setFormData(prev => ({ ...prev, resumeUrl: res.data.url }));
+      setResumeName(file.name);
+    } catch (err) {
+      console.error("Upload failed", err);
+      alert("Failed to upload resume. Please try again.");
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const removeResume = () => {
+    setFormData(prev => ({ ...prev, resumeUrl: '' }));
+    setResumeName("");
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.resumeUrl) {
+      alert("Please upload your resume before submitting.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitStatus(null);
     try {
@@ -48,7 +113,8 @@ export default function JobDetails() {
       
       if (res.status === 200 || res.status === 201) {
         setSubmitStatus({ type: 'success', message: 'Application sent! We will review your portfolio.' });
-        setFormData({ name: '', email: '', whatsapp: '', portfolioUrl: '', resumeUrl: '', message: '' });
+        setFormData({ name: '', email: '', whatsapp: '', linkedin: '', portfolioUrl: '', resumeUrl: '', message: '' });
+        setResumeName("");
       }
     } catch (err) {
       console.error('Career Form Error:', err.response?.data || err.message);
@@ -74,7 +140,7 @@ export default function JobDetails() {
       <div className="bg-slate-50 min-h-screen pt-40 pb-24 text-center">
         <h2 className="text-3xl font-bold text-slate-900 mb-4">Job Not Found</h2>
         <p className="text-slate-600 mb-8">This position may have been closed or removed.</p>
-        <button onClick={() => navigate('/careers')} className="bg-brand-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-700">
+        <button onClick={() => navigate('/careers')} className="bg-brand-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-700 transition-colors">
           Back to Careers
         </button>
       </div>
@@ -105,9 +171,9 @@ export default function JobDetails() {
               </h1>
               
               <div className="flex flex-wrap gap-4 text-sm font-bold uppercase tracking-wider text-slate-600">
-                <span className="flex items-center gap-2"><MapPin size={18} className="text-brand-500" /> {job.location}</span>
-                <span className="flex items-center gap-2"><Clock size={18} className="text-brand-500" /> {job.type}</span>
-                <span className="flex items-center gap-2"><GraduationCap size={18} className="text-brand-500" /> {job.experience}</span>
+                <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"><MapPin size={18} className="text-brand-500" /> {job.location}</span>
+                <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"><Clock size={18} className="text-brand-500" /> {job.type}</span>
+                <span className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"><GraduationCap size={18} className="text-brand-500" /> {job.experience}</span>
               </div>
             </div>
 
@@ -119,7 +185,7 @@ export default function JobDetails() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="bg-white p-8 rounded-4xl border border-slate-100 shadow-xl shadow-slate-200/40 sticky top-32">
+            <div className="bg-white p-8 rounded-4xl border border-slate-100 shadow-xl shadow-slate-200/40 lg:sticky lg:top-32">
               <div className="mb-8">
                 <h2 className="text-2xl font-display font-bold text-slate-900 tracking-tight">Apply for this role</h2>
                 <p className="text-slate-500 mt-2 text-sm">Submit your portfolio and details below.</p>
@@ -132,39 +198,82 @@ export default function JobDetails() {
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">Full Name</label>
-                    <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50" placeholder="Enter your full name" />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">Email Address</label>
-                    <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50" placeholder="Enter your email address" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">WhatsApp</label>
-                      <input type="text" name="whatsapp" required value={formData.whatsapp} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50" placeholder="Number" />
+                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">Full Name *</label>
+                      <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="Jane Doe" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">Portfolio Link</label>
-                      <input type="url" name="portfolioUrl" required value={formData.portfolioUrl} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50" placeholder="URL" />
+                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">Email Address *</label>
+                      <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="jane@example.com" />
                     </div>
                   </div>
-                  
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">Resume Link (Drive/PDF)</label>
-                    <input type="url" name="resumeUrl" required value={formData.resumeUrl} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50" placeholder="Paste link here..." />
+
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">WhatsApp / Phone *</label>
+                      <input type="text" name="whatsapp" required value={formData.whatsapp} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="+91 98765 43210" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">LinkedIn Profile *</label>
+                      <input type="url" name="linkedin" required value={formData.linkedin} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="https://linkedin.com/in/..." />
+                    </div>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider ml-1">Why should we hire you?</label>
-                    <textarea name="message" rows={3} required value={formData.message} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 outline-none transition-all bg-slate-50/50 resize-none" placeholder="Keep it real..."></textarea>
+                    <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">
+                      GitHub / Portfolio <span className="text-slate-400 font-normal lowercase">(Optional)</span>
+                    </label>
+                    <input type="url" name="portfolioUrl" value={formData.portfolioUrl} onChange={handleInputChange} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium" placeholder="https://github.com/..." />
                   </div>
-                  
-                  <button type="submit" disabled={submitting} className="w-full py-4 rounded-xl bg-brand-600 text-white font-bold text-lg hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20 disabled:opacity-70 mt-4">
-                    {submitting ? 'Sending...' : 'Submit Application'}
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">Resume / CV (PDF) *</label>
+                    <div 
+                      onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
+                      className={`relative w-full rounded-xl border-2 border-dashed transition-all p-6 flex flex-col items-center justify-center gap-3 cursor-pointer ${
+                        dragActive ? 'border-brand-500 bg-brand-50/50' : 
+                        formData.resumeUrl ? 'border-emerald-500 bg-emerald-50/20' : 
+                        'border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400'
+                      }`}
+                      onClick={() => !formData.resumeUrl && inputRef.current.click()}
+                    >
+                      <input ref={inputRef} type="file" accept="application/pdf" className="hidden" onChange={handleChange} />
+                      
+                      {uploadingResume ? (
+                        <div className="flex flex-col items-center text-brand-600">
+                          <Loader2 size={28} className="animate-spin mb-2" />
+                          <p className="text-sm font-bold">Uploading securely...</p>
+                        </div>
+                      ) : formData.resumeUrl ? (
+                        <div className="flex flex-col items-center text-emerald-600 w-full">
+                          <CheckCircle2 size={32} className="mb-2" />
+                          <p className="text-sm font-bold text-center truncate max-w-50">{resumeName}</p>
+                          <button type="button" onClick={(e) => { e.stopPropagation(); removeResume(); }} className="mt-3 flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 font-bold transition-colors">
+                            <X size={14} /> Remove File
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center text-slate-500">
+                          <div className="w-12 h-12 bg-white rounded-full shadow-sm border border-slate-100 flex items-center justify-center mb-3 text-slate-400 group-hover:text-brand-500 transition-colors">
+                            <UploadCloud size={24} />
+                          </div>
+                          <p className="text-sm font-bold text-slate-700">Click to upload or drag and drop</p>
+                          <p className="text-xs text-slate-400 mt-1">PDF max 10MB</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-1">
+                      Why are you a great fit? <span className="text-slate-400 font-normal lowercase">(Optional)</span>
+                    </label>
+                    <textarea name="message" rows={4} value={formData.message} onChange={handleInputChange} className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none transition-all bg-slate-50/50 text-sm font-medium resize-none leading-relaxed" placeholder="Tell us about a project you are proud of..."></textarea>
+                  </div>
+
+                  <button type="submit" disabled={submitting || uploadingResume} className="w-full py-4 rounded-xl bg-brand-600 text-white font-bold text-base hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/25 disabled:opacity-70 mt-6 active:scale-[0.98] flex justify-center items-center gap-2">
+                    {submitting ? <><Loader2 size={20} className="animate-spin" /> Submitting...</> : 'Submit Application'}
                   </button>
                 </form>
               )}

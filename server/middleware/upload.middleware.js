@@ -40,14 +40,36 @@ export const uploadToCloudinary = async (localFilePath) => {
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
       transformation: [{ width: 1000, crop: "limit", fetch_format: "auto", quality: "auto" }] 
     });
-    
     fs.unlinkSync(localFilePath);
-    
     return result.secure_url;
   } catch (error) {
-    if (fs.existsSync(localFilePath)) {
-      fs.unlinkSync(localFilePath); 
-    }
+    if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath); 
     throw new Error('Cloudinary upload failed: ' + error.message);
+  }
+};
+
+export const uploadDocument = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF documents are allowed."), false);
+    }
+  }
+});
+
+export const uploadPdfToCloudinary = async (localFilePath) => {
+  try {
+    const result = await cloudinary.uploader.upload(localFilePath, {
+      folder: 'xr_system_resumes',
+      resource_type: "raw",
+    });
+    fs.unlinkSync(localFilePath);
+    return result.secure_url;
+  } catch (error) {
+    if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
+    throw new Error('Cloudinary PDF upload failed: ' + error.message);
   }
 };
