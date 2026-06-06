@@ -4,6 +4,13 @@ import { Save, Image as ImageIcon, Loader2, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import JoditEditor from 'jodit-react';
 
+const decodeHTML = (html) => {
+  if (!html) return '';
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+};
+
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -21,7 +28,11 @@ export default function AdminBlogEditor() {
           const allBlogs = res.data?.data?.blogs || [];
           const foundBlog = allBlogs.find(b => b._id === id);
           if (foundBlog) {
-            setBlog(foundBlog);
+            setBlog({
+              ...foundBlog,
+              content: decodeHTML(foundBlog.content),
+              excerpt: decodeHTML(foundBlog.excerpt)
+            });
           }
         })
         .catch(err => console.error("Error fetching blog for edit:", err))
