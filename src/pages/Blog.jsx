@@ -75,7 +75,6 @@ export default function Blog() {
                     {post.title}
                   </h2>
                   
-                  {/* FIX: Normal <p> tag ko hata kar dangerouslySetInnerHTML lagaya gaya hai taaki HTML tags safe tarike se render hon */}
                   <div 
                     className="text-slate-600 font-serifBody text-lg line-clamp-3"
                     dangerouslySetInnerHTML={{ __html: post.excerpt }}
