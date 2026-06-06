@@ -4,6 +4,18 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
+const createSafeHTML = (htmlContent) => {
+  if (!htmlContent) return { __html: '' };
+  
+  if (typeof window !== 'undefined') {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = htmlContent;
+    return { __html: txt.value };
+  }
+  
+  return { __html: htmlContent };
+};
+
 export default function BlogPost() {
   const { slug } = useParams();
   const [post, setPost] = useState(null);
@@ -50,8 +62,8 @@ export default function BlogPost() {
       )}
 
       <div 
-        className="prose prose-lg max-w-none premium-blog mt-12 prose-a:text-brand-600"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        className="prose prose-lg max-w-none premium-blog mt-12 prose-a:text-brand-600 prose-img:rounded-2xl"
+        dangerouslySetInnerHTML={createSafeHTML(post.content)}
       />
     </article>
   );
