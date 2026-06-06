@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Target, Eye, Heart, Award, Code, X, Briefcase, User } from 'lucide-react';
+import { Target, Eye, Heart, Award, Code, X, Briefcase, User, Linkedin } from 'lucide-react';
 import axios from 'axios';
 import SEO from '../components/SEO';
 
@@ -23,6 +23,7 @@ export default function About() {
       id: 'js-mahato',
       name: 'JS Mahato', 
       role: 'Founder & CEO', 
+      linkedin: 'https://in.linkedin.com/in/jsmahato',
       image: siteSettings?.team?.jsMahato || 'https://picsum.photos/seed/jsmahato/600/800', 
       bio: 'JS Mahato is a passionate developer and entrepreneur with a background in Information Technology. He founded XR System with the vision of helping businesses build a strong online presence through modern and affordable digital solutions. He focuses on web development, business strategy, and creating scalable digital products that deliver real results.',
       experience: 'Hands-on experience in Full Stack Web Development (MERN Stack) with real-world projects and startup-based solutions.',
@@ -32,6 +33,7 @@ export default function About() {
       id: 'monu-nayak',
       name: 'Suryanshu Kumar Nayak', 
       role: 'COO', 
+      linkedin: '',
       image: siteSettings?.team?.monuNayak || 'https://picsum.photos/seed/monu/600/800', 
       bio: 'Suryanshu Kumar Nayak oversees the overall operations and execution at XR System. He ensures that projects are delivered efficiently, timelines are maintained, and team coordination runs smoothly. His focus is on optimizing workflows, improving productivity, and maintaining high-quality service delivery for clients.',
       experience: 'Practical experience in operations management, team coordination, and project execution in a startup environment.',
@@ -41,6 +43,7 @@ export default function About() {
       id: 'chandi-charan-sahu',
       name: 'Chandi Charan Sahu', 
       role: 'CTO', 
+      linkedin: 'https://in.linkedin.com/in/chandicharansahu',
       image: siteSettings?.team?.chandiSahu || 'https://picsum.photos/seed/chandi/600/800', 
       bio: 'Chandi Charan Sahu leads the technical development at XR System. With strong knowledge of modern web technologies, he focuses on building responsive, secure, and scalable web applications tailored to client needs.',
       experience: 'Hands-on experience in full-stack development using modern technologies with a focus on scalable web applications.',
@@ -50,6 +53,7 @@ export default function About() {
       id: 'priyanshu-gupta',
       name: 'Priyanshu Gupta', 
       role: 'CFO', 
+      linkedin: '',
       image: siteSettings?.team?.priyanshuGupta || 'https://picsum.photos/seed/priyanshu/600/800', 
       bio: 'Priyanshu Gupta manages financial planning and operational support at XR System. He ensures smooth financial processes and supports the team in maintaining efficient workflows and project execution.',
       experience: 'Experience in financial planning and operational coordination for startup-level execution.',
@@ -189,7 +193,19 @@ export default function About() {
               <div className="md:w-3/5 p-6 sm:p-8 md:p-10 lg:p-16 overflow-y-auto flex-1">
                 <div className="mb-8 pr-8">
                   <h2 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-2 tracking-tight">{selectedMember.name}</h2>
-                  <p className="text-brand-600 font-bold uppercase tracking-[0.2em] text-xs md:text-sm">{selectedMember.role}</p>
+                  <div className="flex items-center gap-4 flex-wrap mt-2">
+                    <p className="text-brand-600 font-bold uppercase tracking-[0.2em] text-xs md:text-sm">{selectedMember.role}</p>
+                    {selectedMember.linkedin && (
+                      <a 
+                        href={selectedMember.linkedin} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-1.5 text-[#0A66C2] bg-[#0A66C2]/10 hover:bg-[#0A66C2] hover:text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors"
+                      >
+                        <Linkedin size={14} /> LinkedIn
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-6 md:space-y-8">
