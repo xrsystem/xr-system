@@ -74,10 +74,14 @@ export default function Blog() {
                   <h2 className="text-3xl font-display font-bold text-slate-900 group-hover:text-brand-600 transition-colors">
                     {post.title}
                   </h2>
-                  <p className="text-slate-600 font-serifBody text-lg line-clamp-3">{post.excerpt}</p>
+                  
+                  {/* FIX: Normal <p> tag ko hata kar dangerouslySetInnerHTML lagaya gaya hai taaki HTML tags safe tarike se render hon */}
+                  <div 
+                    className="text-slate-600 font-serifBody text-lg line-clamp-3"
+                    dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                  />
                   
                   <div className="flex items-center gap-3 pt-4">
-                    {/* 🟢 FIX 2: Company Logo yahan add kiya hai */}
                     <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 overflow-hidden shadow-sm p-1.5">
                       <img src="/favicon.png" alt="XR System" className="w-full h-full object-contain" />
                     </div>
